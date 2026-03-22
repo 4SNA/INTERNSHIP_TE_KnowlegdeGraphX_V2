@@ -1,0 +1,49 @@
+# IDE / OS
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Node.js
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Next.js
+**/frontend/.next/
+**/frontend/out/
+**/frontend/.env.local
+**/frontend/.env.development.local
+**/frontend/.env.test.local
+**/frontend/.env.production.local
+
+# Java / Maven
+**/backend/target/
+**/backend/.mvn/wrapper/maven-wrapper.jar
+**/backend/.settings/
+**/backend/.project
+**/backend/.classpath
+**/backend/*.iml
+**/backend/bin/
+
+# Docker / Environment
+.env
+.docker-compose.yml.local
+
+# Vector DB / Local Data
+**/backend/data/
+**/backend/vector-db/
+*.log
+*.tmp
+*.bak
+
+# Project Specific
+test.txt
