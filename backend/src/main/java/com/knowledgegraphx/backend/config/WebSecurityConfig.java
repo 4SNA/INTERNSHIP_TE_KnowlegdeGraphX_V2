@@ -1,5 +1,7 @@
 package com.knowledgegraphx.backend.config;
 
+import com.knowledgegraphx.backend.security.JwtAuthenticationFilter;
+import com.knowledgegraphx.backend.security.OAuth2SuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +25,14 @@ import java.util.Arrays;
 @EnableMethodSecurity
 public class WebSecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final OAuth2SuccessHandler oauth2SuccessHandler;
+
+    public WebSecurityConfig(JwtAuthenticationFilter jwtAuthFilter, OAuth2SuccessHandler oauth2SuccessHandler) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.oauth2SuccessHandler = oauth2SuccessHandler;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -43,9 +53,12 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oauth2SuccessHandler)
             );
 
-        // JWT Filter will be added here once implemented
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }

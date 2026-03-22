@@ -12,6 +12,12 @@ export const metadata: Metadata = {
   description: "Centralized, intelligent, and queryable knowledge system.",
 };
 
+import { AuthProvider } from "@/context/AuthContext";
+import { SessionProvider } from "@/context/SessionContext";
+import { DocumentProvider } from "@/context/DocumentContext";
+import { ChatProvider } from "@/context/ChatContext";
+import { WebSocketProvider } from "@/context/WebSocketContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,7 +26,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} dark antialiased`} suppressHydrationWarning>
       <body className="bg-zinc-950 text-zinc-50 font-sans min-h-screen flex selection:bg-indigo-500/30">
-        {children}
+        <AuthProvider>
+          <SessionProvider>
+            <DocumentProvider>
+              <ChatProvider>
+                <WebSocketProvider>
+                  {children}
+                </WebSocketProvider>
+              </ChatProvider>
+            </DocumentProvider>
+          </SessionProvider>
+        </AuthProvider>
       </body>
     </html>
   );

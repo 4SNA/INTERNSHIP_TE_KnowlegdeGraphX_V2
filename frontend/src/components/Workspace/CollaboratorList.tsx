@@ -1,27 +1,17 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { User, ShieldCheck, Sparkles } from "lucide-react";
-
-interface Collaborator {
-  id: string;
-  name: string;
-  avatar?: string;
-  role: "admin" | "collaborator";
-  isTyping?: boolean;
-}
+import { useWebSocket } from "@/context/WebSocketContext";
+import { useAuth } from "@/context/AuthContext";
 
 export function CollaboratorList() {
-  const collaborators: Collaborator[] = [
-    { id: "1", name: "You (Admin)", role: "admin" },
-    { id: "2", name: "Sarah J.", role: "collaborator" },
-    { id: "3", name: "Mike Chen", role: "collaborator", isTyping: true },
-    { id: "4", name: "Alex R.", role: "collaborator" },
-  ];
+  const { activeUsers } = useWebSocket();
+  const { user: currentUser } = useAuth();
 
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between px-2">
-         <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Collaborators ({collaborators.length})</h3>
+         <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Collaborators ({activeUsers.length})</h3>
          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[10px] font-bold text-emerald-400">Live</span>
@@ -29,8 +19,14 @@ export function CollaboratorList() {
       </div>
       
       <div className="space-y-2">
-        {collaborators.map((user) => (
-          <div key={user.id} className="group relative flex items-center gap-3 p-3 rounded-2xl bg-zinc-900/40 border border-transparent hover:border-zinc-800 transition-all cursor-pointer">
+        {activeUsers.length === 0 && (
+          <div className="p-4 text-center">
+             <p className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest leading-relaxed">No neural entities detected in this workspace</p>
+          </div>
+        )}
+        
+        {activeUsers.map((name, idx) => (
+          <div key={idx} className="group relative flex items-center gap-3 p-3 rounded-2xl bg-zinc-900/40 border border-transparent hover:border-zinc-800 transition-all cursor-pointer">
             <div className="relative">
                <div className="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-400 group-hover:border-indigo-500/30 transition-all">
                   <User size={18} />
@@ -39,20 +35,15 @@ export function CollaboratorList() {
             </div>
             <div className="flex-1 min-w-0">
                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-bold text-zinc-100 truncate">{user.name}</span>
-                  {user.role === "admin" && <ShieldCheck size={12} className="text-indigo-400" />}
+                  <span className="text-sm font-bold text-zinc-100 truncate">
+                    {name === currentUser?.name ? "You (Admin)" : name}
+                  </span>
+                  {(name === currentUser?.name) && <ShieldCheck size={12} className="text-indigo-400" />}
                </div>
                <p className="text-[10px] text-zinc-500 font-medium truncate">
-                {user.isTyping ? "Thinking..." : "Active in session"}
+                Active in session
                </p>
             </div>
-            {user.isTyping && (
-              <div className="flex gap-1 items-center px-2 py-1 bg-indigo-500/10 rounded-lg">
-                 <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                 <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                 <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce" />
-              </div>
-            )}
           </div>
         ))}
       </div>

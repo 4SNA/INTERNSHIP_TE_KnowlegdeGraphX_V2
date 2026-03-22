@@ -13,21 +13,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+    private final com.knowledgegraphx.backend.repository.UserRepository userRepository;
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request) {
-        User user = authService.registerUser(request);
-        return ResponseEntity.ok(user);
-    }
-
-    @PostMapping("/login")
+    @PostMapping("/login/success")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest request) {
         String token = authService.login(request);
-        return ResponseEntity.ok(token);
+        com.knowledgegraphx.backend.model.User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("token", token);
+        response.put("user", java.util.Map.of(
+            "id", user.getId(),
+            "name", user.getFullName(),
+            "email", user.getEmail()
+        ));
+        
+        return ResponseEntity.ok(response);
     }
 }

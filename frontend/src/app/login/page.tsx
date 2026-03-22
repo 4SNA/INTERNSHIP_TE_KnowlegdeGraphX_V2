@@ -6,10 +6,35 @@ import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Card } from "@/components/Card";
 import { Brain, Chrome, Github, ArrowRight, Sparkles } from "lucide-react";
+import { authApi } from "@/api/auth";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
+
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const data = await authApi.loginSuccess({ email, password });
+      login(data.token, data.user);
+      router.push('/');
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Invalid credentials. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-zinc-950 relative overflow-hidden font-sans">
@@ -37,6 +62,7 @@ export default function LoginPage() {
            <div className="space-y-4">
               <Button 
                 variant="outline" 
+                onClick={handleGoogleLogin}
                 className="w-full h-12 rounded-2xl border-zinc-800 bg-zinc-950/60 hover:bg-zinc-900 text-zinc-300 gap-3 group"
               >
                 <div className="w-5 h-5 flex items-center justify-center">
@@ -44,7 +70,7 @@ export default function LoginPage() {
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-1.01.68-2.3 1.08-3.71 1.08-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                       <path d="M5.84 14.12c-.22-.68-.35-1.41-.35-2.12s.13-1.44.35-2.12V7.04H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.96l3.66-2.84z"/>
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.04l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.18 7.04l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                    </svg>
                 </div>
                 <span className="font-bold">Continue with Google</span>
@@ -58,7 +84,7 @@ export default function LoginPage() {
            </div>
 
            {/* Form */}
-           <div className="space-y-4">
+           <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                  <label className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest ml-1">Email Address</label>
                  <Input 
@@ -72,7 +98,7 @@ export default function LoginPage() {
               <div className="space-y-2">
                  <div className="flex items-center justify-between ml-1">
                     <label className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest">Password</label>
-                    <button className="text-[9px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase">Forgot?</button>
+                    <button type="button" className="text-[9px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase">Forgot?</button>
                  </div>
                  <Input 
                    type="password" 
@@ -83,14 +109,18 @@ export default function LoginPage() {
                  />
               </div>
               
-              <Button className="w-full h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-extrabold shadow-xl shadow-indigo-500/10 mt-2 gap-2 group overflow-hidden">
-                <span className="relative z-10">Sign in to Space</span>
-                <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1 px-0.5 transition-transform" />
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-extrabold shadow-xl shadow-indigo-500/10 mt-2 gap-2 group overflow-hidden"
+              >
+                <span className="relative z-10">{isLoading ? "Verifying..." : "Sign in to Space"}</span>
+                {!isLoading && <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1 px-0.5 transition-transform" />}
                 <div className="absolute inset-0 bg-white/10 translate-y-full hover:translate-y-0 transition-transform duration-500" />
               </Button>
-           </div>
+           </form>
 
-           <p className="text-center text-xs font-bold text-zinc-600 uppercase tracking-widest">
+           <p className="text-center text-xs font-bold text-zinc-600 uppercase tracking-widest pt-4">
               No access yet? <Link href="/signup" className="text-indigo-400 hover:text-indigo-300 transition-colors">Join the Waitlist</Link>
            </p>
         </Card>

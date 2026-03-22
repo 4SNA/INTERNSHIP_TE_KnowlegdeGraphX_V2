@@ -2,64 +2,24 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Send, FileText, Sparkles, Copy, ThumbsUp, ChevronRight, SendHorizontal, BrainCircuit, ExternalLink } from "lucide-react";
 import { Button } from "../Button";
-
-interface Citation {
-  id: string;
-  source: string;
-  page: number;
-  highlightedText: string;
-}
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  citations?: Citation[];
-  timestamp: string;
-}
+import { useChat } from "@/context/ChatContext";
+import { useSession } from "@/context/SessionContext";
 
 export function WorkspaceChatUI() {
-  const [messages, setMessages] = React.useState<Message[]>([
-    { 
-      id: "1", 
-      role: "assistant", 
-      content: "Hello collaborators! I've analyzed your uploaded documents for this session. How can I assist with your workspace objectives today?",
-      timestamp: "10:00 AM"
-    },
-    {
-      id: "2",
-      role: "assistant",
-      content: "Based on the Market_Analysis_Q1.pdf, our competitive edge is driven by our R&D cycle which is 20% faster than industry standard.",
-      citations: [
-        { id: "c1", source: "Market_Analysis_Q1.pdf", page: 4, highlightedText: "R&D efficiency is up to 20% faster..." }
-      ],
-      timestamp: "10:05 AM"
-    }
-  ]);
+  const { messages, isLoading: isThinking, sendMessage } = useChat();
+  const { activeSession } = useSession();
   const [input, setInput] = React.useState("");
-  const [isThinking, setIsThinking] = React.useState(false);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    const userMsg: Message = { id: Date.now().toString(), role: "user", content: input, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
-    setMessages([...messages, userMsg]);
+  const handleSend = async () => {
+    if (!input.trim() || !activeSession) return;
+    const currentInput = input;
     setInput("");
-    setIsThinking(true);
-    
-    // Simulate AI response
-    setTimeout(() => {
-        setIsThinking(false);
-        const aiMsg: Message = { 
-          id: (Date.now() + 1).toString(), 
-          role: "assistant", 
-          content: "I've cross-referenced that with the Manifesto. The key takeaway is our focus on scalability.",
-          citations: [
-            { id: "c2", source: "Project_Manifesto_v2.pdf", page: 12, highlightedText: "The core architecture is horizontally scalable..." }
-          ],
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-        };
-        setMessages(prev => [...prev, aiMsg]);
-    }, 2000);
+    try {
+      await sendMessage(currentInput);
+    } catch (e) {
+      console.error(e);
+      setInput(currentInput);
+    }
   };
 
   return (
@@ -84,13 +44,13 @@ export function WorkspaceChatUI() {
               )}>
                 {m.content}
                 
-                {m.citations && (
+                {m.sources && m.sources.length > 0 && (
                    <div className="mt-4 flex flex-wrap gap-2">
-                     {m.citations.map(c => (
-                        <div key={c.id} className="flex items-center gap-1.5 px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-indigo-400 group/cite cursor-pointer hover:bg-indigo-500/20 transition-all border-dashed">
+                     {m.sources.map((source, idx) => (
+                        <div key={idx} className="flex items-center gap-1.5 px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-indigo-400 group/cite cursor-pointer hover:bg-indigo-500/20 transition-all border-dashed">
                            <FileText size={10} />
                            <span className="text-[10px] font-bold uppercase tracking-tighter">
-                              {c.source} • P.{c.page}
+                              {source}
                            </span>
                            <ExternalLink size={10} className="hover:scale-110 transition-transform" />
                         </div>
@@ -100,7 +60,9 @@ export function WorkspaceChatUI() {
               </div>
               
               <div className="flex items-center gap-3 px-1">
-                 <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">{m.timestamp}</span>
+                 <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
+                   {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                 </span>
                  {m.role === "assistant" && (
                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button className="text-zinc-600 hover:text-indigo-400 transition-colors"><ThumbsUp size={12} /></button>

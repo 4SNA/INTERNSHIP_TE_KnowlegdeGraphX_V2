@@ -6,9 +6,9 @@ spring:
     name: KnowledgeGraphX
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/knowledgegraphx
-    username: postgres
-    password: password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/knowledgegraphx}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -20,23 +20,31 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   
+  cache:
+    type: none # Disabling Redis cache for native Plan B
+
   data:
     redis:
-      host: localhost
-      port: 6379
+      repositories:
+        enabled: false # Disabling Redis for native Plan B
   
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: YOUR_GOOGLE_CLIENT_ID
-            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            client-id: ${GOOGLE_CLIENT_ID:YOUR_GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET:YOUR_GOOGLE_CLIENT_SECRET}
             scope:
               - email
               - profile
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-name: Google
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 # JWT Configuration
 app:

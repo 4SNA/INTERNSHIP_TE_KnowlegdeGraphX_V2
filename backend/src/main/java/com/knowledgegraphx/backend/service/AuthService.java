@@ -4,10 +4,10 @@ import com.knowledgegraphx.backend.dto.LoginRequest;
 import com.knowledgegraphx.backend.dto.RegisterRequest;
 import com.knowledgegraphx.backend.model.User;
 import com.knowledgegraphx.backend.repository.UserRepository;
+import com.knowledgegraphx.backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +19,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public User registerUser(RegisterRequest request) {
@@ -37,11 +38,10 @@ public class AuthService {
     }
 
     public String login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
         
-        // This is where JWT generation will occur
-        return "JWT_TOKEN_PLACEHOLDER";
+        return jwtUtil.generateToken(request.getEmail());
     }
 }

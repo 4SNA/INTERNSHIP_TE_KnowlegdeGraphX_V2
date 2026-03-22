@@ -1,6 +1,8 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { FileText, Search, MoreVertical, PlusCircle, CheckCircle } from "lucide-react";
+import { FileText, Search, MoreVertical, PlusCircle, CheckCircle, Loader2 } from "lucide-react";
+import { useDocuments } from "@/context/DocumentContext";
+import { useSession } from "@/context/SessionContext";
 
 interface DocumentItemProps {
   name: string;
@@ -35,12 +37,32 @@ function DocumentItem({ name, citedTotal, active }: DocumentItemProps) {
 }
 
 export function DocumentExplorer() {
+  const { documents, loading, uploadFile } = useDocuments();
+  const { activeSession } = useSession();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && activeSession) {
+      await uploadFile(file);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col gap-6">
       <div className="space-y-4 px-1">
         <div className="flex items-center justify-between">
            <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500">Workspace Corpus</h3>
-           <PlusCircle size={14} className="text-zinc-600 hover:text-indigo-400 cursor-pointer transition-colors" />
+           <button onClick={() => fileInputRef.current?.click()} className="text-zinc-600 hover:text-indigo-400 cursor-pointer transition-colors">
+              <PlusCircle size={14} />
+           </button>
+           <input 
+             type="file" 
+             ref={fileInputRef} 
+             className="hidden" 
+             onChange={handleFileChange}
+             accept=".pdf,.csv,.docx,.txt"
+           />
         </div>
         
         <div className="relative group">
@@ -56,21 +78,31 @@ export function DocumentExplorer() {
       </div>
       
       <div className="flex-1 overflow-y-auto pr-1 space-y-1 custom-scrollbar">
-         <DocumentItem name="Project_Manifesto_v2.pdf" citedTotal={12} active />
-         <DocumentItem name="Market_Analysis_Q1.pdf" citedTotal={42} />
-         <DocumentItem name="User_Feedback_Report.pdf" citedTotal={3} />
-         <DocumentItem name="Competitive_Deepdive.pdf" />
-         <DocumentItem name="Financial_Summary_2025.csv" />
-         <DocumentItem name="R&D_Internal_Guidelines.docx" citedTotal={8} />
+         {loading && (
+           <div className="flex items-center justify-center py-10 text-zinc-600 gap-2">
+             <Loader2 size={16} className="animate-spin" />
+             <span className="text-[10px] font-bold uppercase tracking-widest">Indexing...</span>
+           </div>
+         )}
+         
+         {!loading && documents.length === 0 && (
+           <div className="text-center py-10 px-4">
+             <p className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest">No sources indexed</p>
+           </div>
+         )}
+
+         {!loading && documents.map(doc => (
+           <DocumentItem key={doc.id} name={doc.fileName} />
+         ))}
       </div>
       
       <div className="mt-auto border-t border-zinc-900 pt-4 px-2">
          <div className="bg-gradient-to-br from-indigo-500/10 to-purple-600/5 p-4 rounded-3xl border border-indigo-500/20">
             <h4 className="text-[10px] font-bold text-indigo-400 uppercase mb-2">Space quota</h4>
             <div className="h-1.5 w-full bg-zinc-900 rounded-full overflow-hidden">
-               <div className="h-full w-2/3 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+               <div className="h-full w-1/4 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
             </div>
-            <p className="text-[9px] text-zinc-600 mt-2 font-medium">12.4 GB / 25 GB used</p>
+            <p className="text-[9px] text-zinc-600 mt-2 font-medium">Free Tier Active</p>
          </div>
       </div>
     </div>
