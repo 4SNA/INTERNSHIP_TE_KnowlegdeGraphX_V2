@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@theme {
+  /* PRODUCTION COLOR SYSTEM */
+  --color-zinc-950: #09090b;
+  --color-zinc-900: #18181b;
+  --color-zinc-800: #27272a;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-600: #52525b;
+  --color-zinc-500: #71717a;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-50: #fafafa;
+
+  --color-indigo-500: #6366f1;
+  --color-indigo-400: #818cf8;
+  --color-indigo-600: #4f46e5;
+  --color-purple-500: #a855f7;
+  --color-purple-600: #9333ea;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-400: #22d3ee;
+  
+  --color-emerald-500: #10b981;
+  --color-emerald-400: #34d399;
+  --color-amber-500: #f59e0b;
+
+  /* BRAND SEMANTICS */
+  --color-primary: var(--color-indigo-500);
+  --color-primary-hover: var(--color-indigo-400);
+  --color-background: var(--color-zinc-950);
+  --color-foreground: var(--color-zinc-100);
+  --color-border: rgba(39, 39, 42, 0.4); /* zinc-800/40 */
+  --color-card-bg: rgba(24, 24, 27, 0.4); /* zinc-900/40 */
+  
+  /* TYPOGRAPHY */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-none;
+  }
+  body {
+    @apply bg-background text-foreground selection:bg-primary/30 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/40 shadow-2xl;
+  }
+  .glass-panel {
+    @apply bg-zinc-950/60 backdrop-blur-2xl border border-zinc-800/60 shadow-[0_0_100px_rgba(0,0,0,0.5)];
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400;
+  }
+  
+  /* CUSTOM SCROLLBAR REFINEMENT */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-zinc-800) transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-zinc-800 rounded-full hover:bg-zinc-700 transition-colors;
+  }
+
+  /* ACCESSIBLE FOCUS STATES */
+  .focus-ring {
+    @apply focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all outline-none;
+  }
+}
+
+/* ANIMATION SUITE */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-pulse-slow { animation: pulse-slow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.animate-spin-slow { animation: spin-slow 12s linear infinite; }
+.animate-slide-up { animation: slide-up 0.5s ease-out forwards; }
