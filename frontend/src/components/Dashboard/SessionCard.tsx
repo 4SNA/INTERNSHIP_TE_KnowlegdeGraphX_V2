@@ -6,10 +6,14 @@ import { Card } from "../Card";
 interface SessionCardProps {
   code: string;
   usersCount: number;
+  avatars?: string[];
   active?: boolean;
 }
 
-export function SessionCard({ code, usersCount, active = false }: SessionCardProps) {
+export function SessionCard({ code, usersCount, avatars = [], active = false }: SessionCardProps) {
+  // Use unique avatars or placeholders
+  const displayAvatars = avatars.length > 0 ? avatars.slice(0, 3) : [];
+  
   return (
     <Card className={cn(
       "hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer group p-6 rounded-[32px] relative overflow-hidden",
@@ -42,15 +46,22 @@ export function SessionCard({ code, usersCount, active = false }: SessionCardPro
         
         <div className="flex items-center justify-between pt-2">
             <div className="flex items-center gap-2">
-               <div className="flex -space-x-2">
-                  {[1, 2].map((i) => (
-                     <div key={i} className="w-7 h-7 rounded-lg border border-zinc-900 bg-zinc-800 flex items-center justify-center text-[10px] text-zinc-400">
-                        {String.fromCharCode(64 + i)}
+               <div className="flex -space-x-1.5">
+                  {displayAvatars.map((url, i) => (
+                     <div key={i} className="w-8 h-8 rounded-xl border-2 border-zinc-950 bg-zinc-800 flex items-center justify-center overflow-hidden shadow-lg transition-transform group-hover:-translate-y-0.5">
+                        <img src={url} alt="Collaborator" className="w-full h-full object-cover" />
                      </div>
                   ))}
-                  <div className="w-7 h-7 rounded-lg border border-zinc-900 bg-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">
-                    +{usersCount}
-                  </div>
+                  {usersCount > displayAvatars.length && (
+                    <div className="w-8 h-8 rounded-xl border-2 border-zinc-950 bg-indigo-500 text-white flex items-center justify-center text-[10px] font-bold shadow-lg transition-transform group-hover:-translate-y-0.5">
+                      +{usersCount - displayAvatars.length}
+                    </div>
+                  )}
+                  {displayAvatars.length === 0 && usersCount === 0 && (
+                    <div className="w-8 h-8 rounded-xl border-border-zinc-800 bg-zinc-900 group-hover:bg-zinc-800 transition-colors flex items-center justify-center text-zinc-700 group-hover:text-indigo-400">
+                       <Users size={12} />
+                    </div>
+                  )}
                </div>
                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest ml-1">{usersCount > 0 ? `${usersCount} Active` : 'Synced'}</span>
             </div>

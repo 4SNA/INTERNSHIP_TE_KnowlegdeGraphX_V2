@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -41,7 +43,36 @@ public class AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-        
+
+        // Update last login
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+
         return jwtUtil.generateToken(request.getEmail());
+    }
+
+    public String generateTokenForUser(String email) {
+        return jwtUtil.generateToken(email);
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+
+    @Transactional
+    public User updateProfile(String email, com.knowledgegraphx.backend.dto.ProfileUpdateRequest request) {
+        User user = getUserByEmail(email);
+
+        if (request.getFullName() != null && !request.getFullName().isBlank()) {
+            user.setFullName(request.getFullName());
+        }
+
+        if (request.getAvatarUrl() != null) {
+            user.setAvatarUrl(request.getAvatarUrl());
+        }
+
+        return userRepository.save(user);
     }
 }

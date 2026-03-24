@@ -14,5 +14,14 @@ export const sessionApi = {
   getUsers: async (sessionId: number) => {
     const response = await axiosInstance.get(`/session/${sessionId}/users`);
     return response.data;
+  },
+
+  getMySessions: async () => {
+    const response = await axiosInstance.get('/session/my');
+    return response.data;
+  },
+
+  terminateSession: async (code: string): Promise<void> => {
+    await axiosInstance.delete(`/session/${code}`);
   }
 };

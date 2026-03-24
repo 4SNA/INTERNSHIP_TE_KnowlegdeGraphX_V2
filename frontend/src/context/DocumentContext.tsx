@@ -9,7 +9,7 @@ interface Document {
   fileName: string;
   fileType: string;
   fileSize: number;
-  uploadedAt: string;
+  createdAt: string;
 }
 
 interface DocumentContextType {
@@ -19,6 +19,7 @@ interface DocumentContextType {
   uploadProgress: number;
   fetchDocuments: () => Promise<void>;
   uploadFile: (file: File) => Promise<void>;
+  removeDocument: (id: number) => Promise<void>;
 }
 
 const DocumentContext = createContext<DocumentContextType | undefined>(undefined);
@@ -31,7 +32,10 @@ export function DocumentProvider({ children }: { children: React.ReactNode }) {
   const { activeSession } = useSession();
 
   const fetchDocuments = useCallback(async () => {
-    if (!activeSession) return;
+    if (!activeSession) {
+      setDocuments([]);
+      return;
+    }
     setLoading(true);
     try {
       const docs = await documentApi.getAll(activeSession.sessionId);
@@ -69,8 +73,17 @@ export function DocumentProvider({ children }: { children: React.ReactNode }) {
     }
   }, [activeSession, fetchDocuments]);
 
+  const removeDocument = useCallback(async (id: number) => {
+    try {
+      await documentApi.remove(id);
+      setDocuments(prev => prev.filter(doc => doc.id !== id));
+    } catch (error) {
+      console.error("Deletion failed:", error);
+    }
+  }, []);
+
   return (
-    <DocumentContext.Provider value={{ documents, loading, uploading, uploadProgress, fetchDocuments, uploadFile }}>
+    <DocumentContext.Provider value={{ documents, loading, uploading, uploadProgress, fetchDocuments, uploadFile, removeDocument }}>
       {children}
     </DocumentContext.Provider>
   );

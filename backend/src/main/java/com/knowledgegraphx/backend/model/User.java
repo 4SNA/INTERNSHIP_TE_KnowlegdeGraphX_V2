@@ -49,6 +49,6 @@ public class User {
     }
 
     public enum AuthProvider {
-        local, google
+        local, google, github
     }
 }

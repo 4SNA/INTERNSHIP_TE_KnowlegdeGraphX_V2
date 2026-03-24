@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
+  UserCircle,
+  LayoutGrid,
   LucideIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -80,9 +82,11 @@ export function Sidebar() {
 
   const menuItems = [
     { icon: BarChart3, label: "Command Center", href: "/" },
+    { icon: LayoutGrid, label: "Workspace Hub", href: "/workspaces" },
     { icon: FileText, label: "Knowledge Base", href: "/documents" },
     { icon: Network, label: "Neural Graph", href: "/graph" },
     { icon: History, label: "Intelligence log", href: "/history" },
+    { icon: UserCircle, label: "Neural Identity", href: "/profile" },
   ];
 
   return (

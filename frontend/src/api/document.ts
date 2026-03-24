@@ -16,5 +16,9 @@ export const documentApi = {
   getAll: async (sessionId: number) => {
     const response = await axiosInstance.get(`/documents/${sessionId}`);
     return response.data;
+  },
+
+  remove: async (id: number) => {
+    return axiosInstance.delete(`/documents/${id}`);
   }
 };

@@ -3,6 +3,7 @@ package com.knowledgegraphx.backend.service;
 import com.knowledgegraphx.backend.model.QueryHistory;
 import com.knowledgegraphx.backend.model.Session;
 import com.knowledgegraphx.backend.model.User;
+import com.knowledgegraphx.backend.repository.DocumentRepository;
 import com.knowledgegraphx.backend.repository.QueryHistoryRepository;
 import com.knowledgegraphx.backend.repository.SessionRepository;
 import com.knowledgegraphx.backend.repository.UserRepository;
@@ -27,6 +28,7 @@ public class QueryService {
     private final QueryHistoryRepository queryHistoryRepository;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
     private final org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
     @Transactional
@@ -40,13 +42,10 @@ public class QueryService {
                         .sessionId(sessionId)
                         .build());
 
-        // 1. Retrieve & Generate (Cached part)
-        // Note: For internal calls to be cached, we'd need another service, but for demonstration 
-        // we'll keep it here and advise on the proxy limitation or use a self-injection if needed.
-        // For now, we'll implement it as a high-fidelity SaaS pattern.
+        // 1. Retrieve & Generate
         String answer = getAnswer(question, sessionId);
 
-        // 2. Audit Logic (ALWAYS occurs)
+        // 2. Audit Logic
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("Inquirer user not found"));
         
@@ -62,7 +61,7 @@ public class QueryService {
         
         queryHistoryRepository.save(history);
 
-        // Broadcast the final AI Response to everyone in the session
+        // Broadcast the final AI Response
         messagingTemplate.convertAndSend("/topic/session/" + sessionId, 
                 com.knowledgegraphx.backend.dto.ChatMessage.builder()
                         .type(com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE)
@@ -74,30 +73,36 @@ public class QueryService {
         return answer;
     }
 
-    @org.springframework.cache.annotation.Cacheable(value = "ai_responses", key = "{#question, #sessionId}")
     public String getAnswer(String question, Long sessionId) {
         // 1. Retrieve relevant chunks
-        List<TextSegment> relevantChunks = vectorSearchService.searchRelevantChunks(question, sessionId, 5);
+        List<TextSegment> relevantChunks = vectorSearchService.searchRelevantChunks(question, sessionId, 10);
         
-        if (relevantChunks.isEmpty()) {
-            return "I'm sorry, I couldn't find any relevant information in the session's documents to answer your question.";
-        }
+        // 2. Retrieve all documents in this session for context anchoring
+        List<com.knowledgegraphx.backend.model.Document> sessionDocs = documentRepository.findBySessionId(sessionId);
+        String docList = sessionDocs.stream()
+                .map(d -> String.format("- %s (ID: %d)", d.getFileName(), d.getId()))
+                .collect(Collectors.joining("\n"));
 
-        // 2. Build Context
-        String context = relevantChunks.stream()
+        // 3. Build Context
+        String context = relevantChunks.isEmpty() 
+            ? "No direct semantic matches found." 
+            : relevantChunks.stream()
                 .map(seg -> String.format("[Source Document ID: %s] %s", 
                         seg.metadata().getString("documentId"), 
                         seg.text()))
                 .collect(Collectors.joining("\n\n"));
 
-        // 3. Prompt Construction
+        // 4. Prompt Construction
         String promptTemplate = """
                 You are a Knowledge Assistant for KnowledgeGraphX.
-                Use the following retrieved context segments to answer the user's question.
-                If the context doesn't contain the answer, say "The current workspace knowledge doesn't contain enough information to answer this."
-                Always cite the source document IDs using [Source Document ID: X] when answering.
+                You are operating in a workspace with the following indexed documents:
+                %s
                 
-                Context:
+                Using the following retrieved context segments (if any) and your knowledge of the document list, answer the user's question.
+                If the user asks about a specific file from the list above but no context segments are provided, you can mention that the file exists but no detailed content was retrieved.
+                Always cite the source document IDs using [Source Document ID: X] when answering from context.
+                
+                Retrieved Context:
                 %s
                 
                 Question:
@@ -106,9 +111,9 @@ public class QueryService {
                 Answer:
                 """;
 
-        String fullPrompt = String.format(promptTemplate, context, question);
+        String fullPrompt = String.format(promptTemplate, docList, context, question);
         
-        log.info("Generating AI Answer (Cache Miss) for session {}", sessionId);
+        log.info("Generating AI Answer for session {}", sessionId);
         return chatLanguageModel.generate(fullPrompt);
     }
 }

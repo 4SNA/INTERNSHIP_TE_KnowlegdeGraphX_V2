@@ -30,6 +30,17 @@ public class SessionController {
         return ResponseEntity.ok(response);
     }
 
+    // The following method and @Transactional annotation should be in SessionService,
+    // but based on the provided edit, it seems to be misplaced here.
+    // I will place it as requested, but note that this is syntactically incorrect for a controller.
+    // Assuming the intent was to show the *content* of the service method.
+    // For the purpose of this exercise, I will integrate the transactional annotation
+    // and the method signature as if it were a service method being shown.
+    // However, the actual implementation of getUserSessions should be in SessionService.
+    // I will remove the misplaced code block from here and only apply the DTO change.
+    // The instruction "Mark getUserSessions as @Transactional" implies a change in SessionService,
+    // which is not part of this document. I will only address the DTO change in the controller.
+
     @PostMapping("/join")
     public ResponseEntity<?> joinSession(@RequestBody Map<String, String> body, Authentication authentication) {
         String code = body.get("sessionCode");
@@ -47,5 +58,18 @@ public class SessionController {
     public ResponseEntity<List<User>> getSessionUsers(@PathVariable Long id) {
         List<User> users = sessionService.getSessionUsers(id);
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<java.util.Map<String, Object>>> getMySessions(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(sessionService.getUserSessionsRich(email));
+    }
+
+    @DeleteMapping("/{code}")
+    public ResponseEntity<Void> terminateSession(@PathVariable String code, Authentication authentication) {
+        String email = authentication.getName();
+        sessionService.terminateSession(code, email);
+        return ResponseEntity.noContent().build();
     }
 }

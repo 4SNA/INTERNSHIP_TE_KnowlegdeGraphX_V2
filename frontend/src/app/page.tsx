@@ -8,6 +8,7 @@ import { Card } from "@/components/Card";
 import { SessionCard } from "@/components/Dashboard/SessionCard";
 import { DocumentCard } from "@/components/Dashboard/DocumentCard";
 import { QueryCard } from "@/components/Dashboard/QueryCard";
+import { ChatUI } from "@/components/ChatUI";
 import { cn } from "@/lib/utils";
 import { 
   Plus, 
@@ -29,6 +30,7 @@ import { useSession } from "@/context/SessionContext";
 import { useDocuments } from "@/context/DocumentContext";
 import { useChat } from "@/context/ChatContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { sessionApi } from "@/api/session";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -39,20 +41,31 @@ export default function Home() {
   const { messages, isLoading: chatLoading } = useChat();
   const router = useRouter();
 
+  const [sessions, setSessions] = React.useState<any[]>([]);
+
+  const fetchSessions = React.useCallback(async () => {
+    try {
+      const mySessions = await sessionApi.getMySessions();
+      setSessions(mySessions);
+    } catch (e) {
+      console.error("Dashboard sync failed", e);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchSessions();
+  }, [fetchSessions]);
+
   const handleCreateSession = async () => {
     try {
       await createSession();
-      // Router will happen in useEffect to ensure state is synced
+      // Wait for state to sync or refresh
+      setTimeout(fetchSessions, 1000);
     } catch (e) {
       console.error(e);
+      alert("Neural sync failure");
     }
   };
-
-  React.useEffect(() => {
-    if (activeSession) {
-      // Stay on dashboard, but we can have an 'Open' button or auto-navigate
-    }
-  }, [activeSession]);
 
   const openSession = (code: string) => {
     router.push(`/session/${code}`);
@@ -66,23 +79,20 @@ export default function Home() {
         <div className="flex flex-1 overflow-hidden relative text-zinc-100">
           <Sidebar />
           
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 no-scrollbar focus:outline-none" tabIndex={-1}>
-            <div className="max-w-[1400px] mx-auto space-y-12 pb-24">
+          <main className="flex-1 overflow-y-auto p-4 md:p-10 lg:p-16 custom-scrollbar no-scrollbar scroll-smooth">
+            <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
               
-              {/* HERO & ACTION SECTION */}
-              <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 pt-4">
+              {/* WELCOME HEADER */}
+              <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-2 animate-in fade-in duration-1000">
-                     <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,1)] animate-pulse" />
-                     <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-[0.2em] px-3 py-1 bg-indigo-500/10 rounded-full border border-indigo-500/20">System Live</span>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                    <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-[0.2em]">Neural Link Established</span>
                   </div>
                   <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-zinc-100 tracking-tight leading-[1.1]">
                     Welcome back,<br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400">{user?.name || "Neural Operator"}</span>
                   </h1>
-                  <p className="text-zinc-500 font-medium max-w-xl text-sm md:text-lg leading-relaxed font-sans">
-                    Your collective workspace is synchronized. KnowledgeGraphX has indexed {documents.length} sources across your active sessions.
-                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-4">
                    <Link href="/documents">
@@ -117,23 +127,43 @@ export default function Home() {
                        <div className="p-2.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shadow-sm">
                           <Users2 size={24} />
                        </div>
-                       <h2 className="text-xl md:text-2xl font-extrabold text-zinc-100 tracking-tight">Active Workspace</h2>
+                       <h2 className="text-xl md:text-2xl font-extrabold text-zinc-100 tracking-tight">Your Workspaces</h2>
                     </div>
                  </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                   {activeSession ? (
-                      <div onClick={() => openSession(activeSession.sessionCode)} className="cursor-pointer group">
-                        <SessionCard code={activeSession.sessionCode} usersCount={1} active />
-                      </div>
-                   ) : (
+                    {/* ALWAYS show the ACTIVE SESSION first if it exists, even if not in discovery list */}
+                    {activeSession && !sessions.find(s => s.sessionCode === activeSession.sessionCode) && (
+                       <div onClick={() => openSession(activeSession.sessionCode)} className="cursor-pointer group">
+                         <SessionCard 
+                            code={activeSession.sessionCode} 
+                            usersCount={1} 
+                            active 
+                         />
+                       </div>
+                    )}
+
+                    {sessions.map((session) => (
+                       <div key={session.sessionId} onClick={() => openSession(session.sessionCode)} className="cursor-pointer group">
+                         <SessionCard 
+                            code={session.sessionCode} 
+                            usersCount={session.memberCount} 
+                            avatars={session.collaborators}
+                            active={activeSession?.sessionCode === session.sessionCode} 
+                         />
+                       </div>
+                    ))}
+
+                    {sessions.length === 0 && !activeSession && (
                       <div 
                         onClick={handleCreateSession}
-                        className="border-2 border-dashed border-zinc-900/60 rounded-[40px] p-8 flex flex-col items-center justify-center gap-4 bg-zinc-900/10 hover:bg-zinc-900/20 transition-all min-h-[160px] cursor-pointer"
+                        className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 p-20 text-center rounded-[40px] bg-zinc-900/10 border border-dashed border-zinc-800/40 opacity-50 space-y-4"
                       >
-                         <Brain size={32} className="text-zinc-800" />
-                         <p className="text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">No active workspace</p>
+                         <Brain size={48} className="mx-auto text-zinc-900" />
+                         <p className="text-sm font-extrabold text-zinc-700 uppercase tracking-widest">No workspace history found</p>
+                         <p className="text-xs text-zinc-600 font-medium">Start a new collaboration to begin mapping your neural graph.</p>
                       </div>
-                   )}
+                    )}
+                    
                     <div 
                       onClick={handleCreateSession}
                       className="border-2 border-dashed border-zinc-900 rounded-[40px] p-8 flex flex-col items-center justify-center gap-4 group cursor-pointer hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all active:scale-[0.98] min-h-[160px]"
@@ -182,37 +212,17 @@ export default function Home() {
                  </section>
 
                  {/* RECENT QUERIES */}
-                 <section className="lg:col-span-4 space-y-6">
+                 <section className="lg:col-span-4 flex flex-col space-y-6 min-h-[500px]">
                     <div className="flex items-center justify-between px-1">
                       <div className="flex items-center gap-3">
                          <div className="p-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
                             <MessageSquareShare size={24} />
                          </div>
-                         <h2 className="text-xl md:text-2xl font-extrabold text-zinc-100 tracking-tight">Neural Feed</h2>
+                         <h2 className="text-xl md:text-2xl font-extrabold text-zinc-100 tracking-tight">Neural Terminal</h2>
                       </div>
                     </div>
-                    <div className="space-y-4">
-                       {messages.filter(m => m.role === 'assistant').length === 0 ? (
-                         <div className="p-6 bg-zinc-900/10 rounded-[32px] border border-zinc-900/60 text-center border-dashed backdrop-blur-sm">
-                            <p className="text-[10px] font-extrabold text-zinc-700 uppercase tracking-widest">Awaiting Queries...</p>
-                         </div>
-                       ) : (
-                         messages.filter(m => m.role === 'assistant').slice(-2).map((m) => (
-                           <QueryCard 
-                              key={m.id}
-                              query="Knowledge Retrieval" 
-                              response={m.content} 
-                              timestamp="Live" 
-                           />
-                         ))
-                       )}
-                       <Link href="/history">
-                         <div className="p-6 bg-zinc-900/10 rounded-[32px] border border-zinc-900/60 text-center border-dashed backdrop-blur-sm group cursor-pointer hover:bg-zinc-900/30 transition-all mt-4">
-                            <p className="text-[10px] font-extrabold text-zinc-500 group-hover:text-indigo-400 uppercase tracking-[0.3em] transition-colors flex items-center justify-center gap-2">
-                              View Intelligence Log <ArrowRight size={12} />
-                            </p>
-                         </div>
-                       </Link>
+                    <div className="flex-1 overflow-hidden">
+                       <ChatUI />
                     </div>
                  </section>
 

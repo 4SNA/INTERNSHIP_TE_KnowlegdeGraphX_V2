@@ -5,12 +5,53 @@ import Link from "next/link";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Card } from "@/components/Card";
-import { Brain, Chrome, ShieldCheck, ArrowRight, UserPlus, Sparkles } from "lucide-react";
+import { Brain, ShieldCheck, ArrowRight, UserPlus, Sparkles, AlertCircle } from "lucide-react";
+import { authApi } from "@/api/auth";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const { login, user } = useAuth();
+  const router = useRouter();
+
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
+  const handleGoogleSignup = () => {
+    window.location.href = authApi.getGoogleLoginUrl();
+  };
+
+  const handleGitHubSignup = () => {
+    window.location.href = authApi.getGitHubLoginUrl();
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+    try {
+      const data = await authApi.register({ fullName: name, email, password });
+      login(data.token, data.user);
+    } catch (err: any) {
+      const message = err?.response?.data?.error 
+        || err?.response?.data?.email 
+        || err?.response?.data?.fullName
+        || err?.response?.data?.password
+        || 'Registration failed. Please try again.';
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-zinc-950 relative overflow-hidden font-sans">
@@ -34,10 +75,19 @@ export default function SignupPage() {
               <Brain size={160} />
            </div>
 
+           {/* Error Display */}
+           {error && (
+             <div className="flex items-center gap-3 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 animate-slide-up relative z-10">
+               <AlertCircle size={18} className="shrink-0" />
+               <p className="text-sm font-medium">{error}</p>
+             </div>
+           )}
+
            {/* Social Auth */}
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
               <Button 
                 variant="outline" 
+                onClick={handleGoogleSignup}
                 className="w-full h-12 rounded-2xl border-zinc-800 bg-zinc-950/60 hover:bg-zinc-900 text-zinc-300 gap-3 group"
               >
                 <div className="w-5 h-5 flex items-center justify-center">
@@ -52,6 +102,7 @@ export default function SignupPage() {
               </Button>
               <Button 
                 variant="outline" 
+                onClick={handleGitHubSignup}
                 className="w-full h-12 rounded-2xl border-zinc-800 bg-zinc-950/60 hover:bg-zinc-900 text-zinc-300 gap-3 group px-4"
               >
                 <div className="w-5 h-5 flex items-center justify-center">
@@ -63,43 +114,50 @@ export default function SignupPage() {
               </Button>
            </div>
 
-           <div className="flex items-center gap-4">
+           <div className="flex items-center gap-4 relative z-10">
               <div className="h-[1px] flex-1 bg-zinc-800" />
               <span className="text-[10px] uppercase font-extrabold text-zinc-600 tracking-widest">or neural link</span>
               <div className="h-[1px] flex-1 bg-zinc-800" />
            </div>
 
            {/* Form Layout */}
-           <div className="space-y-6">
+           <form onSubmit={handleSignup} className="space-y-6 relative z-10">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest ml-1">Full Name</label>
+                    <label htmlFor="signup-name" className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest ml-1">Full Name</label>
                     <Input 
+                      id="signup-name"
                       placeholder="Jane Doe" 
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      required
                       className="bg-zinc-950/60 border-zinc-800 font-medium h-12" 
                     />
                  </div>
                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest ml-1">Work Email</label>
+                    <label htmlFor="signup-email" className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest ml-1">Work Email</label>
                     <Input 
+                      id="signup-email"
                       type="email" 
                       placeholder="jane@org.com" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      required
                       className="bg-zinc-950/60 border-zinc-800 font-medium h-12" 
                     />
                  </div>
               </div>
 
               <div className="space-y-2">
-                 <label className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest ml-1">Secret Password</label>
+                 <label htmlFor="signup-password" className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest ml-1">Secret Password</label>
                  <Input 
+                   id="signup-password"
                    type="password" 
-                   placeholder="Create a strong key" 
+                   placeholder="Create a strong key (min 6 chars)" 
                    value={password}
                    onChange={(e) => setPassword(e.target.value)}
+                   required
+                   minLength={6}
                    className="bg-zinc-950/60 border-zinc-800 font-medium h-12" 
                  />
               </div>
@@ -109,13 +167,19 @@ export default function SignupPage() {
                  <p className="text-[10px] text-zinc-500 font-medium leading-relaxed">By creating your space, you agree to our <Link href="#" className="underline hover:text-indigo-400">Neural Privacy Protocol</Link> and data handling guidelines.</p>
               </div>
 
-              <Button className="w-full h-14 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-extrabold shadow-2xl shadow-indigo-500/20 mt-2 gap-3 group relative overflow-hidden active:scale-95 transition-all">
-                <span className="relative z-10 text-lg uppercase tracking-tight">Sync Space Access</span>
-                <Sparkles size={20} className="relative z-10 group-hover:scale-125 transition-transform duration-500 text-white" />
+              <Button 
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-14 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-extrabold shadow-2xl shadow-indigo-500/20 mt-2 gap-3 group relative overflow-hidden active:scale-95 transition-all"
+              >
+                <span className="relative z-10 text-lg uppercase tracking-tight">
+                  {isLoading ? "Creating Space..." : "Sync Space Access"}
+                </span>
+                {!isLoading && <Sparkles size={20} className="relative z-10 group-hover:scale-125 transition-transform duration-500 text-white" />}
               </Button>
-           </div>
+           </form>
 
-           <p className="text-center text-xs font-bold text-zinc-600 uppercase tracking-widest">
+           <p className="text-center text-xs font-bold text-zinc-600 uppercase tracking-widest relative z-10">
               Already have Access? <Link href="/login" className="text-indigo-400 hover:text-indigo-300 transition-colors">SignIn instead</Link>
            </p>
         </Card>

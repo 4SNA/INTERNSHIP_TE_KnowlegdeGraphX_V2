@@ -21,12 +21,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   
   cache:
-    type: none # Disabling Redis cache for native Plan B
+    type: none
 
   data:
     redis:
       repositories:
-        enabled: false # Disabling Redis for native Plan B
+        enabled: false
   
   security:
     oauth2:
@@ -40,6 +40,14 @@ spring:
               - profile
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-name: Google
+          github:
+            client-id: ${GITHUB_CLIENT_ID:YOUR_GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET:YOUR_GITHUB_CLIENT_SECRET}
+            scope:
+              - user:email
+              - read:user
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: GitHub
 
   servlet:
     multipart:
@@ -48,5 +56,6 @@ spring:
 
 # JWT Configuration
 app:
-  jwtSecret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  jwtSecret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   jwtExpirationMs: 86400000 # 24 hours
+  frontendUrl: ${FRONTEND_URL:http://localhost:3000}

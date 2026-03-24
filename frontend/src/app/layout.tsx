@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} dark antialiased`} suppressHydrationWarning>
-      <body className="bg-zinc-950 text-zinc-50 font-sans min-h-screen flex selection:bg-indigo-500/30">
+      <body className="bg-zinc-950 text-zinc-50 font-sans min-h-screen selection:bg-indigo-500/30">
         <AuthProvider>
           <SessionProvider>
             <DocumentProvider>

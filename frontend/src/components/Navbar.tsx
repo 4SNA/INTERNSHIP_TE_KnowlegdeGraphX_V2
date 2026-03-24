@@ -3,14 +3,59 @@
 import * as React from "react";
 import Link from "next/link";
 import { Button } from "./Button";
-import { Brain, Search, Plus, UserCircle, Users, Menu, X } from "lucide-react";
+import { Brain, Search, Plus, UserCircle, Users, Menu, X, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { useSession } from "@/context/SessionContext";
+import { NewInsightModal } from "./NewInsightModal";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
+  const { user } = useAuth();
+  const { activeSession, terminateActiveSession } = useSession();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isInsightModalOpen, setIsInsightModalOpen] = React.useState(false);
+  const [showToast, setShowToast] = React.useState(false);
+
+  const handleTerminate = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm("Terminate workspace? All associated records, documents, and collaborative connections will be permanently destroyed.")) {
+       try {
+         await terminateActiveSession();
+         router.push("/");
+       } catch (error: any) {
+         alert("Failed to terminate neural link.");
+       }
+    }
+  };
+
+  const triggerComingSoon = () => {
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
 
   return (
-    <nav className="h-16 border-b border-zinc-800/60 bg-zinc-950/60 backdrop-blur-lg sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 shadow-sm">
+    <nav className="h-16 w-full border-b border-zinc-800/60 bg-zinc-950/60 backdrop-blur-lg sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 shadow-sm">
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-top-4 fade-in duration-500">
+          <div className="flex items-center gap-3 px-6 py-3 bg-zinc-900/90 border border-indigo-500/30 backdrop-blur-md rounded-2xl shadow-2xl shadow-indigo-500/10 ring-1 ring-white/5">
+            <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+               <Users size={16} />
+            </div>
+            <div className="flex flex-col">
+               <span className="text-xs font-bold text-white tracking-tight">Collaboration Engine</span>
+               <span className="text-[10px] font-medium text-zinc-400">Neural Sync is currently in development.</span>
+            </div>
+            <div className="ml-4 pl-4 border-l border-white/5">
+               <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest animate-pulse">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* BRAND SECTION */}
       <Link href="/" className="flex items-center gap-2 group outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg p-1">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:rotate-6 transition-transform">
@@ -43,21 +88,68 @@ export function Navbar() {
         </Button>
 
         <div className="hidden sm:flex items-center gap-3">
-          <Button variant="outline" size="sm" className="gap-2 border-zinc-800 text-zinc-400 hover:text-white rounded-xl">
-            <Users size={16} />
-            <span className="hidden lg:inline">Join Session</span>
-          </Button>
-          <Button size="sm" className="gap-2 rounded-xl shadow-indigo-500/10 shadow-lg">
+          {activeSession ? (
+            <div className="flex items-center gap-1">
+              <Link href={`/session/${activeSession?.sessionCode}`} className="block group"> {/* Added null-safe operator */}
+                <div className="flex items-center gap-1.5 p-1 pr-4 bg-indigo-500/10 border border-indigo-500/20 hover:border-indigo-500/40 rounded-xl transition-all cursor-pointer">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
+                    <Users size={16} />
+                  </div>
+                  <div className="flex flex-col">
+                      <span className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-widest leading-none">Active Workspace</span>
+                      <span className="text-[11px] font-bold text-indigo-100 tracking-tight">#{activeSession?.sessionCode}</span> {/* Added null-safe operator */}
+                  </div>
+                </div>
+              </Link>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleTerminate} // Changed to use handleTerminate
+                className="w-10 h-10 rounded-xl text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all border border-transparent hover:border-red-500/20"
+                title="Terminate Workspace"
+              >
+                <X size={18} />
+              </Button>
+            </div>
+          ) : (
+            <Button 
+              onClick={triggerComingSoon}
+              variant="outline" size="sm" className="gap-2 border-zinc-800 text-zinc-400 hover:text-white rounded-xl"
+            >
+              <Users size={16} />
+              <span className="hidden lg:inline">Join Session</span>
+            </Button>
+          )}
+
+          <Button 
+            onClick={() => setIsInsightModalOpen(true)}
+            size="sm" 
+            className="gap-2 rounded-xl shadow-indigo-500/10 shadow-lg"
+          >
             <Plus size={16} />
             <span className="hidden lg:inline">New Insight</span>
           </Button>
         </div>
 
-        <Link href="/profile" className="outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-full">
-           <div className="w-9 h-9 rounded-full border border-zinc-800 bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-700 cursor-pointer transition-all overflow-hidden" title="View Profile">
-             <UserCircle size={24} />
-           </div>
+        <Link href="/settings" className="outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-full group">
+          <div className="flex items-center gap-3 space-x-1">
+             <div className="hidden md:flex flex-col items-end">
+               <span className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight truncate max-w-[120px]">
+                 {user?.name || "Anonymous"}
+               </span>
+               <span className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-widest leading-none">Operator</span>
+             </div>
+             <div className="w-10 h-10 rounded-2xl border border-zinc-800 bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:border-zinc-500 cursor-pointer transition-all overflow-hidden relative shadow-lg shadow-indigo-500/5 ring-0 group-focus-visible:ring-2 ring-indigo-500" title={`Active Profile: ${user?.email}`}>
+               {user?.avatarUrl ? (
+                 <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+               ) : (
+                 <UserCircle size={26} />
+               )}
+               <div className="absolute inset-0 bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+             </div>
+          </div>
         </Link>
+        
 
         {/* MOBILE MENU TOGGLE */}
         <Button 
@@ -71,14 +163,32 @@ export function Navbar() {
         </Button>
       </div>
 
+      <NewInsightModal 
+        isOpen={isInsightModalOpen} 
+        onClose={() => setIsInsightModalOpen(false)} 
+      />
+
       {/* MOBILE OVERLAY MENU (Simple implementation) */}
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-zinc-950 border-b border-zinc-800 p-6 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4 lg:hidden glass z-[999]">
-           <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-2xl border-zinc-800">
+           <Button 
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              triggerComingSoon();
+            }}
+            variant="outline" className="w-full justify-start gap-3 h-12 rounded-2xl border-zinc-800"
+           >
               <Users size={20} />
               <span className="font-bold">Join Active Session</span>
            </Button>
-           <Button className="w-full justify-start gap-3 h-12 rounded-2xl shadow-indigo-500/10 shadow-lg">
+
+           <Button 
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              setIsInsightModalOpen(true);
+            }}
+            className="w-full justify-start gap-3 h-12 rounded-2xl shadow-indigo-500/10 shadow-lg"
+           >
               <Plus size={20} />
               <span className="font-bold">Upload New Document</span>
            </Button>

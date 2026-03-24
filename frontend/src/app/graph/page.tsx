@@ -22,17 +22,37 @@ import {
 import { useSession } from "@/context/SessionContext";
 import { useDocuments } from "@/context/DocumentContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { NewInsightModal } from "@/components/NewInsightModal";
 
 export default function GraphPage() {
   const { activeSession } = useSession();
   const { documents, loading: docsLoading } = useDocuments();
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [isInsightModalOpen, setIsInsightModalOpen] = React.useState(false);
+  const [showShareToast, setShowShareToast] = React.useState(false);
+
+  const handleShare = () => {
+    if (!activeSession) return;
+    navigator.clipboard.writeText(`http://localhost:3000/graph?session=${activeSession.sessionCode}`);
+    setShowShareToast(true);
+    setTimeout(() => setShowShareToast(false), 3000);
+  };
 
   return (
     <ProtectedRoute>
       <div className="flex h-screen w-full flex-col overflow-hidden bg-zinc-950 font-sans selection:bg-indigo-500/30">
         <Navbar />
         
+        {/* Global Share Toast */}
+        {showShareToast && (
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-top-4 fade-in duration-500">
+             <div className="flex items-center gap-3 px-6 py-3 bg-zinc-900/90 border border-indigo-500/30 backdrop-blur-md rounded-2xl shadow-2xl">
+                <Share2 size={16} className="text-indigo-400" />
+                <span className="text-xs font-bold text-white tracking-tight">Workspace Coordinates Copied</span>
+             </div>
+          </div>
+        )}
+
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
           
@@ -64,15 +84,27 @@ export default function GraphPage() {
                       className="h-10 w-full bg-zinc-900/60 border border-zinc-900 rounded-xl pl-9 pr-2 text-[11px] text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all font-sans font-bold" 
                      />
                   </div>
-                  <Button variant="outline" className="h-10 border-zinc-900 bg-zinc-900/40 text-zinc-500 hover:text-white px-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleShare}
+                    className="h-10 border-zinc-900 bg-zinc-900/40 text-zinc-500 hover:text-white px-4"
+                  >
                      <Share2 size={16} />
                   </Button>
-                  <Button className="h-10 gap-2 bg-indigo-600 shadow-lg shadow-indigo-500/20 px-6 rounded-xl hover:bg-indigo-500">
+                  <Button 
+                    onClick={() => setIsInsightModalOpen(true)}
+                    className="h-10 gap-2 bg-indigo-600 shadow-lg shadow-indigo-500/20 px-6 rounded-xl hover:bg-indigo-500"
+                  >
                      <Plus size={16} className="text-white" />
                      <span className="text-white font-bold text-xs uppercase tracking-widest">Add Insight</span>
                   </Button>
                </div>
             </header>
+            
+            <NewInsightModal 
+              isOpen={isInsightModalOpen}
+              onClose={() => setIsInsightModalOpen(false)}
+            />
 
             <div className="flex-1 flex gap-6 min-h-0">
                

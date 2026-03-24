@@ -39,7 +39,18 @@ public class QueryController {
     }
 
     @GetMapping("/history/{sessionId}")
-    public ResponseEntity<List<com.knowledgegraphx.backend.model.QueryHistory>> getHistory(@PathVariable Long sessionId) {
-        return ResponseEntity.ok(queryHistoryRepository.findBySessionIdOrderByTimestampDesc(sessionId));
+    public ResponseEntity<List<com.knowledgegraphx.backend.dto.QueryHistoryResponse>> getHistory(@PathVariable Long sessionId) {
+        List<com.knowledgegraphx.backend.model.QueryHistory> items = queryHistoryRepository.findBySessionIdOrderByTimestampDesc(sessionId);
+        
+        List<com.knowledgegraphx.backend.dto.QueryHistoryResponse> responses = items.stream().map(h -> 
+            com.knowledgegraphx.backend.dto.QueryHistoryResponse.builder()
+                .id(h.getId())
+                .question(h.getQuestion())
+                .response(h.getResponse())
+                .timestamp(h.getTimestamp().toString())
+                .build()
+        ).collect(java.util.stream.Collectors.toList());
+        
+        return ResponseEntity.ok(responses);
     }
 }

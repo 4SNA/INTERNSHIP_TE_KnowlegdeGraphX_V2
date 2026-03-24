@@ -1,39 +1,70 @@
 'use client';
 
-import { useEffect, Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { authApi } from '@/api/auth';
 
 function OAuthHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = searchParams.get('token');
-    
-    // In a production app, the backend should return both token and user, 
-    // but we can also fetch user profile if needed.
-    // For now assuming the redirect includes minimal user info or we use a fixed placeholder
-    // and fetch it later.
-    
-    if (token) {
-      // Decode user info if available in token or from redirect
-      const user = { id: 1, name: 'Google User', email: 'user@gmail.com' }; 
-      login(token, user);
-      router.push('/');
-    } else {
-      router.push('/login');
-    }
+    const handleOAuth = async () => {
+      const token = searchParams.get('token');
+
+      if (!token) {
+        setError('No authentication token received.');
+        setTimeout(() => router.push('/login'), 2000);
+        return;
+      }
+
+      try {
+        // Store token first so the axios interceptor can use it
+        localStorage.setItem('token', token);
+
+        // Fetch real user data from backend using the JWT
+        const userData = await authApi.getMe();
+
+        // Complete login with real user data
+        login(token, userData);
+      } catch (err) {
+        console.error('OAuth callback error:', err);
+        localStorage.removeItem('token');
+        setError('Authentication failed. Redirecting to login...');
+        setTimeout(() => router.push('/login'), 2000);
+      }
+    };
+
+    handleOAuth();
   }, [searchParams, login, router]);
 
   return (
-    <div className="min-h-screen bg-[#050510] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#1a1f35_0%,_#050510_100%)] opacity-50" />
-      <div className="relative text-center">
-        <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin mx-auto mb-6" />
-        <h1 className="text-2xl font-semibold text-white mb-2">Authenticating</h1>
-        <p className="text-cyan-400/60">Establishing secure connection for KnowledgeGraphX...</p>
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center relative overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 blur-[140px] rounded-full animate-pulse-slow" />
+      </div>
+      <div className="relative text-center space-y-6">
+        {error ? (
+          <>
+            <div className="w-16 h-16 mx-auto rounded-full bg-red-500/20 flex items-center justify-center">
+              <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-bold text-red-400">{error}</h1>
+          </>
+        ) : (
+          <>
+            <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin mx-auto" />
+            <h1 className="text-2xl font-bold text-zinc-100">Authenticating</h1>
+            <p className="text-zinc-500 text-sm font-medium uppercase tracking-widest">
+              Establishing secure neural link...
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
@@ -41,7 +72,11 @@ function OAuthHandler() {
 
 export default function OAuthCallback() {
   return (
-    <Suspense>
+    <Suspense fallback={
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin" />
+      </div>
+    }>
       <OAuthHandler />
     </Suspense>
   );
