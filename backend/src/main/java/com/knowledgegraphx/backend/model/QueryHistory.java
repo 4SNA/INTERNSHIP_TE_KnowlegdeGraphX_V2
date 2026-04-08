@@ -33,8 +33,12 @@ public class QueryHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"documents", "collaborators", "queries"})
     private Session session;
 
     @CreationTimestamp
     private LocalDateTime timestamp;
+
+    @Column(columnDefinition = "TEXT")
+    private String suggestedQueries; // stored as a JSON string or semicolon-separated
 }

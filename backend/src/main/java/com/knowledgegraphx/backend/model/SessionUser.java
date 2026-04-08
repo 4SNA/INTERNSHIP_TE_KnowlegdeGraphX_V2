@@ -27,6 +27,7 @@ public class SessionUser {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"documents", "collaborators", "queries"})
     private Session session;
 
     @Enumerated(EnumType.STRING)

@@ -21,12 +21,14 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   
   cache:
-    type: none
+    type: redis
 
   data:
     redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
       repositories:
-        enabled: false
+        enabled: true
   
   security:
     oauth2:
@@ -59,3 +61,16 @@ app:
   jwtSecret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   jwtExpirationMs: 86400000 # 24 hours
   frontendUrl: ${FRONTEND_URL:http://localhost:3000}
+
+ollama:
+  base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+  model: ${OLLAMA_MODEL:llama3}
+  temperature: 0.7
+  timeout-seconds: 120
+
+# HuggingFace Intelligence Config
+hf:
+  api-token: ${HF_API_TOKEN:disabled}
+  model-id: ${HF_MODEL_ID:sentence-transformers/all-MiniLM-L6-v2}
+
+

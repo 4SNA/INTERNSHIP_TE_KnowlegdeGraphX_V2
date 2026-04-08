@@ -2,6 +2,7 @@ package com.knowledgegraphx.backend.controller;
 
 import com.knowledgegraphx.backend.model.Session;
 import com.knowledgegraphx.backend.model.User;
+import com.knowledgegraphx.backend.service.ReportService;
 import com.knowledgegraphx.backend.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class SessionController {
 
     private final SessionService sessionService;
+    private final ReportService reportService;
 
     @PostMapping("/create")
     public ResponseEntity<?> createSession(Authentication authentication) {
@@ -26,6 +28,8 @@ public class SessionController {
         java.util.Map<String, Object> response = new java.util.HashMap<>();
         response.put("sessionId", session.getId());
         response.put("sessionCode", session.getSessionCode());
+        response.put("createdByEmail", session.getCreatedBy().getEmail());
+        response.put("createdByName", session.getCreatedBy().getFullName());
         
         return ResponseEntity.ok(response);
     }
@@ -50,6 +54,8 @@ public class SessionController {
         java.util.Map<String, Object> response = new java.util.HashMap<>();
         response.put("sessionId", session.getId());
         response.put("sessionCode", session.getSessionCode());
+        response.put("createdByEmail", session.getCreatedBy().getEmail());
+        response.put("createdByName", session.getCreatedBy().getFullName());
         
         return ResponseEntity.ok(response);
     }
@@ -71,5 +77,13 @@ public class SessionController {
         String email = authentication.getName();
         sessionService.terminateSession(code, email);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/report")
+    public ResponseEntity<Map<String, String>> generateReport(@PathVariable Long id) {
+        String report = reportService.generateSessionReport(id);
+        Map<String, String> response = new java.util.HashMap<>();
+        response.put("report", report);
+        return ResponseEntity.ok(response);
     }
 }

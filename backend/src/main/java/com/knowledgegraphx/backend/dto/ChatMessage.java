@@ -12,10 +12,16 @@ import lombok.NoArgsConstructor;
 public class ChatMessage {
     private String content;
     private String sender;
+    private String senderEmail;
+    private String avatarUrl;
     private Long sessionId;
     private MessageType type;
+    private String messageId;
+    private java.util.List<String> suggestedQueries;
+    private boolean isStreaming;
+    private boolean isFinal;
 
     public enum MessageType {
-        CHAT, JOIN, LEAVE, AI_QUERY, AI_RESPONSE
+        CHAT, JOIN, LEAVE, AI_QUERY, AI_RESPONSE, STREAM_CHUNK
     }
 }

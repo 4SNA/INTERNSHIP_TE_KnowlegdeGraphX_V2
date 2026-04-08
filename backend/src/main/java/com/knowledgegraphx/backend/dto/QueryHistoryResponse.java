@@ -10,4 +10,6 @@ public class QueryHistoryResponse {
     private String question;
     private String response;
     private String timestamp;
+    private String senderEmail;
+    private java.util.List<String> suggestedQueries;
 }

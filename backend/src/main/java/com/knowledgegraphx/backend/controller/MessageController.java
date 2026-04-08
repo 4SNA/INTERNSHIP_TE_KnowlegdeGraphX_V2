@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class MessageController {
 
+    private final java.util.Map<String, java.util.Set<com.knowledgegraphx.backend.dto.ChatMessage>> sessionUsers = new java.util.concurrent.ConcurrentHashMap<>();
+
     @MessageMapping("/chat.sendMessage/{sessionId}")
     @SendTo("/topic/session/{sessionId}")
     public ChatMessage sendMessage(
@@ -27,7 +29,7 @@ public class MessageController {
 
     @MessageMapping("/chat.addUser/{sessionId}")
     @SendTo("/topic/session/{sessionId}")
-    public ChatMessage addUser(
+    public java.util.List<ChatMessage> addUser(
             @DestinationVariable String sessionId,
             @Payload ChatMessage chatMessage,
             SimpMessageHeaderAccessor headerAccessor
@@ -38,7 +40,18 @@ public class MessageController {
             attributes.put("username", chatMessage.getSender());
             attributes.put("sessionId", sessionId);
         }
-        log.info("Broadcasting user join to session {}", sessionId);
-        return chatMessage;
+
+        sessionUsers.computeIfAbsent(sessionId, k -> java.util.concurrent.ConcurrentHashMap.newKeySet());
+        chatMessage.setType(ChatMessage.MessageType.JOIN);
+        sessionUsers.get(sessionId).add(chatMessage);
+        
+        log.info("User {} joined session {}. Total active: {}", chatMessage.getSender(), sessionId, sessionUsers.get(sessionId).size());
+        
+        // Broadcast the entire active user set to sync everyone
+        return new java.util.ArrayList<>(sessionUsers.get(sessionId));
+    }
+
+    public java.util.Map<String, java.util.Set<ChatMessage>> getSessionUsersMap() {
+        return sessionUsers;
     }
 }

@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface QueryHistoryRepository extends JpaRepository<QueryHistory, Long> {
     List<QueryHistory> findBySessionIdOrderByTimestampDesc(Long sessionId);
+    List<QueryHistory> findTop5BySessionIdOrderByTimestampDesc(Long sessionId);
     List<QueryHistory> findByUserIdOrderByTimestampDesc(Long userId);
     List<QueryHistory> findTop10ByUserIdOrderByTimestampDesc(Long userId);
 }

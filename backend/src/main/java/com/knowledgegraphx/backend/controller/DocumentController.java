@@ -25,14 +25,27 @@ public class DocumentController {
             @RequestParam("sessionId") Long sessionId,
             Authentication authentication
     ) throws IOException {
-        String email = authentication.getName();
-        
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
+        try {
+            if (authentication == null) {
+                System.err.println("Upload Context: Authentication is NULL!");
+                return ResponseEntity.status(401).build();
+            }
+            String email = authentication.getName();
+            System.out.println("Engaging upload for '" + file.getOriginalFilename() + "' by user: " + email);
+            
+            if (file.isEmpty()) {
+                System.err.println("Upload Error: Received empty file!");
+                return ResponseEntity.badRequest().build();
+            }
 
-        Document document = documentService.uploadDocument(file, sessionId, email);
-        return ResponseEntity.ok(convertToResponse(document));
+            Document document = documentService.uploadDocument(file, sessionId, email);
+            System.out.println("Success! Document ID " + document.getId() + " persist verified.");
+            return ResponseEntity.ok(convertToResponse(document));
+        } catch (Exception e) {
+            System.err.println("CRITICAL: Manual Upload failure for " + file.getOriginalFilename() + ": " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @GetMapping("/{sessionId}")

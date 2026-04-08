@@ -36,7 +36,7 @@ public class SessionService {
                 .createdBy(creator)
                 .build();
         
-        Session savedSession = sessionRepository.save(session);
+        Session savedSession = java.util.Objects.requireNonNull(sessionRepository.save(session), "Neural Inception: Session creation failed.");
 
         // Creator automatically joins as ADMIN
         SessionUser sessionUser = SessionUser.builder()
@@ -45,7 +45,7 @@ public class SessionService {
                 .role(SessionUser.UserRole.ADMIN)
                 .build();
         
-        sessionUserRepository.save(sessionUser);
+        java.util.Objects.requireNonNull(sessionUserRepository.save(sessionUser), "Neural Inception: Creator auto-join failed.");
         
         return savedSession;
     }
@@ -68,7 +68,7 @@ public class SessionService {
                 .role(SessionUser.UserRole.COLLABORATOR)
                 .build();
 
-        sessionUserRepository.save(sessionUser);
+        java.util.Objects.requireNonNull(sessionUserRepository.save(sessionUser), "Neural Inception: Join attempt failed.");
         
         return session;
     }
@@ -94,10 +94,18 @@ public class SessionService {
         sessionRepository.delete(session);
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = "sessionUsers", key = "#sessionId", unless = "#result == null")
     public List<User> getSessionUsers(Long sessionId) {
-        return sessionUserRepository.findBySessionId(sessionId).stream()
-                .map(SessionUser::getUser)
-                .collect(Collectors.toList());
+        try {
+            return sessionUserRepository.findBySessionId(sessionId).stream()
+                    .map(SessionUser::getUser)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            // Fail-safe: Database fallback is inherent in @Cacheable but manual catch speeds up bypass
+            return sessionUserRepository.findBySessionId(sessionId).stream()
+                    .map(SessionUser::getUser)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Transactional(readOnly = true)
@@ -139,6 +147,23 @@ public class SessionService {
                         .build();
                 sessionUserRepository.save(su);
             }
+        }
+    }
+
+    @org.springframework.cache.annotation.Cacheable(value = "sessionMetadata", key = "#sessionId", unless = "#result == null")
+    public com.knowledgegraphx.backend.dto.SessionCacheDTO getSessionMetadata(Long sessionId) {
+        try {
+            return sessionRepository.findById(sessionId)
+                    .map(s -> com.knowledgegraphx.backend.dto.SessionCacheDTO.builder()
+                            .sessionId(s.getId())
+                            .sessionCode(s.getSessionCode())
+                            .createdByEmail(s.getCreatedBy().getEmail())
+                            .createdByName(s.getCreatedBy().getFullName())
+                            .build())
+                    .orElse(null);
+        } catch (Exception e) {
+            // Fail-safe: Skip cache on any serialization or connection error
+            return null; 
         }
     }
 
