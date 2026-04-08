@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  /* PRODUCTION COLOR SYSTEM */
-  --color-zinc-950: #09090b;
-  --color-zinc-900: #18181b;
-  --color-zinc-800: #27272a;
-  --color-zinc-700: #3f3f46;
-  --color-zinc-600: #52525b;
+  /* ADVANCED NEURAL COLOR SYSTEM - BLUE & PEACOCK GREEN */
+  --color-zinc-950: #050507;
+  --color-zinc-900: #0a0a0c;
+  --color-zinc-800: #1a1a1e;
+  --color-zinc-700: #2d2d35;
+  --color-zinc-600: #4a4a55;
   --color-zinc-500: #71717a;
   --color-zinc-400: #a1a1aa;
   --color-zinc-300: #d4d4d8;
@@ -14,14 +14,16 @@
   --color-zinc-100: #f4f4f5;
   --color-zinc-50: #fafafa;
 
-  --color-indigo-500: #0ea5e9; /* Peacock Sky */
-  --color-indigo-400: #38bdf8;
-  --color-indigo-600: #0284c7;
-  --color-purple-500: #0d9488; /* Blue-Green / Teal */
+  /* BRAND PALETTE - BLUE BLUE */
+  --color-indigo-500: #2563eb; /* Pure Vibrant Blue */
+  --color-indigo-400: #60a5fa;
+  --color-indigo-600: #1d4ed8;
+  
+  /* BRAND PALETTE - GREEN PEACOCK */
+  --color-purple-500: #0d9488; /* Vibrant Teal/Peacock */
   --color-purple-600: #0f766e;
-  --color-cyan-500: #06b6d4;
-  --color-cyan-400: #22d3ee;
   --color-peacock: #0e7490;
+  --color-peacock-light: #22d3ee;
   
   --color-emerald-500: #10b981;
   --color-emerald-400: #34d399;
@@ -30,10 +32,11 @@
   /* BRAND SEMANTICS */
   --color-primary: var(--color-indigo-500);
   --color-primary-hover: var(--color-indigo-400);
+  --color-secondary: var(--color-purple-500);
   --color-background: var(--color-zinc-950);
   --color-foreground: var(--color-zinc-100);
-  --color-border: rgba(39, 39, 42, 0.4); /* zinc-800/40 */
-  --color-card-bg: rgba(24, 24, 27, 0.4); /* zinc-900/40 */
+  --color-border: rgba(39, 39, 42, 0.4);
+  --color-card-bg: rgba(10, 10, 12, 0.6);
   
   /* TYPOGRAPHY */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
@@ -57,7 +60,7 @@
     @apply bg-zinc-950/60 backdrop-blur-2xl border border-zinc-800/60 shadow-[0_0_100px_rgba(0,0,0,0.5)];
   }
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-emerald-400 to-cyan-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-emerald-400 to-peacock-light;
   }
   
   /* CUSTOM SCROLLBAR REFINEMENT */

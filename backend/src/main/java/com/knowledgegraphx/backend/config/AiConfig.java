@@ -39,7 +39,7 @@ public class AiConfig {
     @Value("${ollama.base-url:http://localhost:11434}")
     private String ollamaBaseUrl;
 
-    @Value("${ollama.model:llama3}")
+    @Value("${ollama.model:mistral}")
     private String ollamaModel;
 
     @Value("${hf.api-token:disabled}")
@@ -62,10 +62,10 @@ public class AiConfig {
     @Bean(name = "llama3ChatModel")
     @Primary
     public ChatLanguageModel llama3ChatModel() {
-        log.info("Neural Engine: Registering High-Fidelity Logic Model (llama3)");
+        log.info("Neural Engine: Registering High-Fidelity Logic Model (mistral-fallback)");
         return dev.langchain4j.model.ollama.OllamaChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
-                .modelName("llama3")
+                .modelName("mistral")
                 .temperature(0.7)
                 .timeout(Duration.ofSeconds(300))
                 .build();
@@ -85,10 +85,10 @@ public class AiConfig {
     @Bean(name = "llama3StreamingModel")
     @Primary
     public StreamingChatLanguageModel llama3StreamingModel() {
-        log.info("Neural Engine: Registering High-Fidelity Streaming Model (llama3)");
+        log.info("Neural Engine: Registering High-Fidelity Streaming Model (mistral-fallback)");
         return dev.langchain4j.model.ollama.OllamaStreamingChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
-                .modelName("llama3")
+                .modelName("mistral")
                 .temperature(0.7)
                 .timeout(Duration.ofSeconds(300))
                 .build();

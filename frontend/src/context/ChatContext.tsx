@@ -125,9 +125,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         const existingMessageIndex = prev.findIndex(m => m.id === mId);
         if (existingMessageIndex !== -1) {
           const updatedMessages = [...prev];
+          const currentContent = updatedMessages[existingMessageIndex].content;
+          
+          // Clear neural status indicator before first real content chunk
+          const isIndicator = currentContent.startsWith('Neural Sync:');
           updatedMessages[existingMessageIndex] = {
             ...updatedMessages[existingMessageIndex],
-            content: updatedMessages[existingMessageIndex].content + content
+            content: isIndicator ? content : currentContent + content
           };
           return updatedMessages;
         } else {
@@ -143,11 +147,19 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
       // 2. Handle Final Responses or Regular Messages
       const isAI = type.includes('AI');
+      const isAIQuery = type === 'AI_QUERY';
+      const isAIResponse = type === 'AI_RESPONSE';
+      const isOwnMessage = payload.senderEmail?.toLowerCase() === user?.email?.toLowerCase();
+
+      // Clinical Deduplication & Ghosting Prevention
+      // If it's a query sync from the user themselves, don't create an assistant bubble for it.
+      if (isAIQuery && isOwnMessage) return prev;
+
       const isDuplicate = prev.some(m => m.id === mId);
       
       if (isDuplicate) {
-        if (isAI && isFinal) {
-          // Finalize the streaming message with metadata
+        if (isAI && (isFinal || isAIResponse)) {
+          // Finalize with metadata
           return prev.map(m => m.id === mId ? { 
             ...m, 
             content: content || m.content, 
@@ -168,7 +180,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         senderEmail: payload.senderEmail || sender 
       }];
     });
-  }, []);
+  }, [user]);
 
   const clearChat = useCallback(() => {
     setMessages([]);

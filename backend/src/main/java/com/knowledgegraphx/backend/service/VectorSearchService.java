@@ -110,14 +110,14 @@ public class VectorSearchService {
         // Phase 3: Rank by Hybrid Score & Apply Quality Gate (0.65 threshold)
         scoredSegments.sort((a, b) -> Double.compare(b.score, a.score));
 
-        // Phase 4: Final Selection (Absorb top high-fidelity fragments up to 3)
+        // Phase 4: Final Selection (Absorb top high-fidelity fragments up to 8)
         List<TextSegment> finalResults = scoredSegments.stream()
-                .filter(s -> s.score >= 0.65) // STRICT QUALITY GATE
-                .limit(3)                    // TOP 3 ONLY
+                .filter(s -> s.score >= 0.55) // Optimized quality gate for local LLMs
+                .limit(8)                    // Increased from 3 to 8 for better RAG context
                 .map(s -> s.segment)
                 .collect(Collectors.toList());
         
-        log.info("=== NEURAL FINAL SELECTION [{} Chunks - Quality Gate: 0.65] ===", finalResults.size());
+        log.info("=== NEURAL FINAL SELECTION [{} Chunks - Quality Gate: 0.55] ===", finalResults.size());
         for (int i = 0; i < finalResults.size(); i++) {
              TextSegment segment = finalResults.get(i);
              log.info("Final Selection [{}]: {}...", i+1, segment.text().length() > 100 ? segment.text().substring(0, 100).replace("\n", " ") : segment.text());

@@ -66,6 +66,24 @@ public class QueryService {
             return QueryResponse.builder().answer("Neural Pulse Active. How can I assist?").sources(Collections.emptyList()).build();
         }
 
+        // Return ACK immediately to frontend for sub-50ms perceived latency
+        CompletableFuture.runAsync(() -> {
+            try {
+                processRagQuery(question, sessionId, userEmail, messageId);
+            } catch (Exception e) {
+                log.error("Neural Exhaustion in async thread", e);
+                broadcastMessageWithId(sessionId, "KnowledgeGraphX AI", "I encountered an error processing your request.", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE, messageId, null, userEmail);
+            }
+        });
+
+        return QueryResponse.builder()
+                .answer(null) // Signal to frontend that streaming will follow
+                .messageId(messageId)
+                .sources(Collections.emptyList())
+                .build();
+    }
+
+    private void processRagQuery(String question, Long sessionId, String userEmail, String messageId) throws Exception {
         List<QueryHistory> history = queryHistoryRepository.findTop5BySessionIdOrderByTimestampDesc(sessionId);
         if (history == null) history = new ArrayList<>();
         
@@ -74,60 +92,53 @@ public class QueryService {
         String normalizedQuery = normalizeQuery(rewrittenQuery);
         
         List<com.knowledgegraphx.backend.model.Document> workspaceDocs = documentRepository.findBySessionId(sessionId);
-        broadcastMessageWithId(sessionId, userEmail, question, com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null);
+        
+        // Step 1: Initialize Neural Registry
+        broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Initializing Neural Registry...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
 
-        try {
-            CompletableFuture<List<TextSegment>> segmentsFuture = CompletableFuture.supplyAsync(() -> {
-                try {
-                    List<TextSegment> raw = vectorSearchService.searchRelevantChunks(normalizedQuery, sessionId, 6);
-                    List<TextSegment> unique = new ArrayList<>();
-                    Set<String> fingerprints = new HashSet<>();
-                    for (TextSegment s : raw) {
-                        String fp = s.text().toLowerCase().replaceAll("[^a-z0-9]", "");
-                        if (fingerprints.add(fp)) unique.add(s);
-                        if (unique.size() >= 3) break;
-                    }
-                    return unique;
-                } catch (Exception e) { return new ArrayList<>(); }
-            });
+        // Step 2: Context Retrieval
+        List<TextSegment> segments = vectorSearchService.searchRelevantChunks(normalizedQuery, sessionId, 10);
+        broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Scanning Workspace Manifest...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
 
-            List<TextSegment> segments = segmentsFuture.get(10, TimeUnit.SECONDS);
-            String docManifest = workspaceDocs.stream().map(com.knowledgegraphx.backend.model.Document::getFileName).collect(Collectors.joining("\n"));
-            String graphContext = getGraphIntelligenceContext(normalizedQuery, sessionId, segments);
-
-            Set<String> distinctSources = new HashSet<>();
-            for (TextSegment seg : segments) {
-                String dId = seg.metadata().getString("documentId");
-                if (dId != null) distinctSources.add(resolveDocName(dId));
-            }
-
-            String answer = null;
-            String cacheKey = "ai:query:" + sessionId + ":" + normalizedQuery;
-            try { answer = redisTemplate.opsForValue().get(cacheKey); } catch (Exception ignore) {}
-
-            if (answer == null) {
-                answer = getSynthesizedAnswerFast(normalizedQuery, history, segments, sessionId, graphContext, docManifest, messageId);
-                if (answer != null) answer = pruneRedundantContent(answer);
-                
-                try { 
-                    if (answer != null) {
-                        redisTemplate.opsForValue().set(cacheKey, answer, Objects.requireNonNull(Duration.ofHours(12))); 
-                    }
-                } catch (Exception ignore) {}
-            } else {
-                broadcastStreamingChunk(sessionId, answer, messageId);
-            }
-
-            List<String> suggestions = generateNeuralSuggestions(question, answer);
-            archiveQuery(question, answer, userEmail, sessionId, suggestions);
-            broadcastMessageWithId(sessionId, "KnowledgeGraphX AI", answer, com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE, messageId, suggestions);
-
-            return QueryResponse.builder().answer(answer).sources(new ArrayList<>(distinctSources)).suggestedQueries(suggestions).messageId(messageId).build();
-
-        } catch (Exception e) {
-            log.error("Neural Exhaustion", e);
-            return QueryResponse.builder().answer("I encountered an internal error.").sources(Collections.emptyList()).build();
+        List<TextSegment> unique = new ArrayList<>();
+        Set<String> fingerprints = new HashSet<>();
+        for (TextSegment s : segments) {
+            String fp = s.text().toLowerCase().replaceAll("[^a-z0-9]", "");
+            if (fingerprints.add(fp)) unique.add(s);
+            if (unique.size() >= 5) break; 
         }
+
+        String answer = null;
+        String cacheKey = "ai:query:" + sessionId + ":" + normalizedQuery;
+        try { answer = redisTemplate.opsForValue().get(cacheKey); } catch (Exception ignore) {}
+
+        if (answer == null) {
+            String docManifest = workspaceDocs.stream().map(com.knowledgegraphx.backend.model.Document::getFileName).collect(Collectors.joining("\n"));
+            String graphContext = getGraphIntelligenceContext(normalizedQuery, sessionId, unique);
+            
+            // Step 3: Neural Synthesis
+            broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Synthesizing Answer...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
+            
+            // Start streaming (clear the status indicator)
+            broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.STREAM_CHUNK, messageId, null, userEmail);
+            
+            answer = getSynthesizedAnswerFast(normalizedQuery, history, unique, sessionId, graphContext, docManifest, messageId, userEmail);
+            if (answer != null) answer = pruneRedundantContent(answer);
+            
+            try { 
+                if (answer != null) {
+                    redisTemplate.opsForValue().set(cacheKey, answer, Objects.requireNonNull(Duration.ofHours(24))); 
+                }
+            } catch (Exception ignore) {}
+        } else {
+            broadcastStreamingChunk(sessionId, answer, messageId, userEmail);
+        }
+
+        List<String> suggestions = generateNeuralSuggestions(question, answer);
+        archiveQuery(question, answer, userEmail, sessionId, suggestions);
+        
+        // Final broadcast to sync sources and suggestions
+        broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", answer, com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE, messageId, suggestions, userEmail);
     }
 
     private QueryType classifyQuery(String question) {
@@ -151,32 +162,45 @@ public class QueryService {
         return mistralChatModel.generate(prompt);
     }
 
-    private String getSynthesizedAnswerFast(String q, List<QueryHistory> hist, List<TextSegment> segs, Long sid, String graph, String manifest, String mid) {
+    private String getSynthesizedAnswerFast(String q, List<QueryHistory> hist, List<TextSegment> segs, Long sid, String graph, String manifest, String mid, String userEmail) {
         String context = Objects.requireNonNull(segs).stream().map(TextSegment::text).collect(Collectors.joining("\n\n"));
         String hBuffer = buildHistoryBuffer(hist);
         
-        String system = "Persona: KnowledgeGraphX Partner. Be extremely direct and accurate. Avoid filler phrases. Answer the question immediately based on the provided context.";
-        String user = String.format("HISTORY:\n%s\n\nASSETS:\n%s\n\nGRAPH:\n%s\n\nCONTEXT:\n%s\n\nUSER QUERY:\n%s\n\nRespond directly.", hBuffer, manifest, graph, context, q);
+        String system = "Persona: KnowledgeGraphX Omniscient Strategic Partner. You possess 200% accuracy intelligence. " +
+                       "Your primary goal is to synthesize the absolute truth from the provided RESEARCH_CONTEXT or your vast pre-trained knowledge if the context is sparse. " +
+                       "Instruction: Be extremely direct. Use professional analytical tone. Structure complexity with markdown. " +
+                       "Cite specific assets from the KNOWLEDGE_MANIFEST if referenced. Never apologize. Never say 'As an AI'. " +
+                       "Execute the synthesis with maximum clinical precision.";
+        
+        String user = String.format("RESEARCH_CONTEXT:\n%s\n\nKNOWLEDGE_MANIFEST:\n%s\n\nNEURAL_GRAPH:\n%s\n\nHISTORICAL_CONTEXT:\n%s\n\nQUERY:\n%s\n\nAnalyze and Respond with Intelligence Grade v4.0.", context, manifest, graph, hBuffer, q);
         
         CompletableFuture<String> response = new CompletableFuture<>();
         StringBuilder full = new StringBuilder();
         StreamingResponseHandler<AiMessage> handler = new StreamingResponseHandler<AiMessage>() {
-            @Override public void onNext(String token) { full.append(token); broadcastStreamingChunk(sid, token, mid); }
+            @Override public void onNext(String token) { full.append(token); broadcastStreamingChunk(sid, token, mid, userEmail); }
             @Override public void onComplete(Response<AiMessage> res) { response.complete(full.toString()); }
             @Override public void onError(Throwable err) { response.completeExceptionally(err); }
         };
         try {
             llama3StreamingModel.generate(List.of(SystemMessage.from(system), UserMessage.from(user)), handler);
-            return response.get(120, TimeUnit.SECONDS);
-        } catch (Exception e) { return "Recovery: Generation interrupted."; }
+            return response.get(180, TimeUnit.SECONDS);
+        } catch (Exception e) { return "CRITICAL ERROR: Intelligence Engine Pulsing. Synthesis Timed Out."; }
     }
 
     private String buildHistoryBuffer(List<QueryHistory> history) {
         return Objects.requireNonNull(history).stream().limit(3).map(h -> "Q: " + h.getQuestion() + "\nA: " + (h.getResponse() != null && h.getResponse().length() > 80 ? h.getResponse().substring(0, 80) : h.getResponse())).collect(Collectors.joining("\n\n"));
     }
 
-    private void broadcastStreamingChunk(Long sid, String chunk, String mid) {
-        messagingTemplate.convertAndSend("/topic/session/" + sid, com.knowledgegraphx.backend.dto.ChatMessage.builder().type(com.knowledgegraphx.backend.dto.ChatMessage.MessageType.STREAM_CHUNK).content(chunk).sessionId(sid).messageId(mid).isStreaming(true).build());
+    private void broadcastStreamingChunk(Long sid, String chunk, String mid, String userEmail) {
+        messagingTemplate.convertAndSend("/topic/session/" + sid, com.knowledgegraphx.backend.dto.ChatMessage.builder()
+                .type(com.knowledgegraphx.backend.dto.ChatMessage.MessageType.STREAM_CHUNK)
+                .content(chunk)
+                .sender("KnowledgeGraphX AI")
+                .senderEmail(userEmail)
+                .sessionId(sid)
+                .messageId(mid)
+                .isStreaming(true)
+                .build());
     }
 
     private String getGraphIntelligenceContext(String q, Long sid, List<TextSegment> segs) {
@@ -210,8 +234,9 @@ public class QueryService {
         } catch (Exception ignore) {}
     }
 
-    private void broadcastMessageWithId(Long s, String snd, String c, com.knowledgegraphx.backend.dto.ChatMessage.MessageType t, String m, List<String> sug) {
-        messagingTemplate.convertAndSend("/topic/session/" + s, com.knowledgegraphx.backend.dto.ChatMessage.builder().type(t).content(c).sender(snd).sessionId(s).messageId(m).suggestedQueries(sug).build());
+    private void broadcastMessageWithId(Long s, String snd, String c, com.knowledgegraphx.backend.dto.ChatMessage.MessageType t, String m, List<String> sug, String senderEmail) {
+        messagingTemplate.convertAndSend("/topic/session/" + s, com.knowledgegraphx.backend.dto.ChatMessage.builder()
+                .type(t).content(c).sender(snd).senderEmail(senderEmail).sessionId(s).messageId(m).suggestedQueries(sug).build());
     }
 
     private String normalizeQuery(String q) { return q != null ? q.toLowerCase().trim().replaceAll("[^a-z0-9\\s]", "") : ""; }

@@ -22,10 +22,14 @@ public class QueryController {
             @RequestBody Map<String, Object> body,
             Authentication authentication
     ) {
-        String question = (String) body.get("question");
-        Long sessionId = Long.valueOf(body.get("sessionId").toString());
-        String email = (authentication != null) ? authentication.getName() : "Anonymous Researcher";
+        String question = (body.get("question") != null) ? body.get("question").toString() : "";
+        Long sessionId = (body.get("sessionId") != null) ? Long.valueOf(body.get("sessionId").toString()) : -1L;
+        String email = (authentication != null && authentication.getName() != null) ? authentication.getName() : "Anonymous Researcher";
         
+        if (sessionId == -1L) {
+            return ResponseEntity.badRequest().body("Invalid sessionId");
+        }
+
         com.knowledgegraphx.backend.dto.QueryResponse responseBody = queryService.performQuery(question, sessionId, email);
         
         return ResponseEntity.ok(responseBody);
