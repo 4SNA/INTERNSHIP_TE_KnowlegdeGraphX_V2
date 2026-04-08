@@ -6,6 +6,7 @@ import { sessionApi } from '@/api/session';
 interface Session {
   sessionId: number;
   sessionCode: string;
+  createdByEmail: string;
 }
 
 interface SessionContextType {

@@ -3,13 +3,16 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { queryApi } from '@/api/query';
 import { useSession } from './SessionContext';
+import { useAuth } from './AuthContext';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   sources?: string[];
+  suggestedQueries?: string[];
   timestamp: string;
+  senderEmail?: string;
 }
 
 interface ChatContextType {
@@ -26,6 +29,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { activeSession } = useSession();
+  const { user } = useAuth();
 
   // Load History when session changes
   useEffect(() => {
@@ -33,11 +37,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       const fetchHistory = async () => {
         try {
           const history = await queryApi.getHistory(activeSession.sessionId);
-          const formatted = history.flatMap((h: any) => [
-            { id: `q-${h.id}`, role: 'user', content: h.question, timestamp: h.timestamp },
-            { id: `a-${h.id}`, role: 'assistant', content: h.response, timestamp: h.timestamp }
-          ]);
-          setMessages(formatted);
+          console.log("Neural History Package:", history);
+          
+          if (Array.isArray(history)) {
+            const formatted = history.flatMap((h: any) => [
+              { id: `q-${h.id}`, role: 'user' as const, content: h.question, timestamp: h.timestamp, senderEmail: h.senderEmail },
+              { id: `a-${h.id}`, role: 'assistant' as const, content: h.response, timestamp: h.timestamp, suggestedQueries: h.suggestedQueries }
+            ]);
+            setMessages(formatted);
+          } else {
+             console.warn("Neural Sync: History packet format incompatible.", history);
+             setMessages([]);
+          }
         } catch (e) {
           console.error("Failed to load chat history:", e);
         }
@@ -58,12 +69,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       alert("Please join a workspace first");
       return;
     }
+    if (isLoading) return; // Prevent overlapping neural queries
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
       content,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      senderEmail: user?.email
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -72,15 +85,23 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await queryApi.ask(content, activeSession.sessionId);
       
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.answer,
-        sources: data.sources,
-        timestamp: new Date().toISOString()
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => {
+        // Clinical Deduplication: If the message (by ID) is already present via WebSocket, skip
+        if (prev.some(m => m.id === data.messageId)) {
+           console.log("Neural Sync: HTTP payload merged with existing Socket payload.");
+           return prev;
+        }
+        
+        const assistantMessage: Message = {
+          id: data.messageId || (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: data.answer,
+          sources: data.sources,
+          suggestedQueries: data.suggestedQueries,
+          timestamp: new Date().toISOString()
+        };
+        return [...prev, assistantMessage];
+      });
     } catch (error) {
        console.error("Query failed:", error);
        setMessages(prev => [...prev, {
@@ -92,27 +113,60 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [activeSession]);
+  }, [activeSession, isLoading]);
 
   const receiveMessage = useCallback((payload: any) => {
-    // Prevent duplicate messages if I am the one who sent them (already added locally)
-    const { sender, content, type, sources } = payload;
-    
-    setMessages(prev => {
-      // Check if message already exists by content/timestamp if needed, 
-      // but for simplicity we'll check against a recently added message
-      const lastMsg = prev[prev.length - 1];
-      if (lastMsg && lastMsg.content === content) return prev;
+    const { sender, content, type, sources, suggestedQueries, messageId, isStreaming, isFinal } = payload;
+    const mId = messageId || Date.now().toString();
 
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        role: type.includes('AI') ? 'assistant' : 'user',
-        content: content,
-        sources: sources,
-        timestamp: new Date().toISOString()
-      };
+    setMessages(prev => {
+      // 1. Handle Real-time Streaming Chunks
+      if (type === 'STREAM_CHUNK') {
+        const existingMessageIndex = prev.findIndex(m => m.id === mId);
+        if (existingMessageIndex !== -1) {
+          const updatedMessages = [...prev];
+          updatedMessages[existingMessageIndex] = {
+            ...updatedMessages[existingMessageIndex],
+            content: updatedMessages[existingMessageIndex].content + content
+          };
+          return updatedMessages;
+        } else {
+          // New streaming message start
+          return [...prev, {
+            id: mId,
+            role: 'assistant',
+            content: content,
+            timestamp: new Date().toISOString()
+          }];
+        }
+      }
+
+      // 2. Handle Final Responses or Regular Messages
+      const isAI = type.includes('AI');
+      const isDuplicate = prev.some(m => m.id === mId);
       
-      return [...prev, newMessage];
+      if (isDuplicate) {
+        if (isAI && isFinal) {
+          // Finalize the streaming message with metadata
+          return prev.map(m => m.id === mId ? { 
+            ...m, 
+            content: content || m.content, 
+            suggestedQueries, 
+            sources 
+          } : m);
+        }
+        return prev;
+      }
+
+      return [...prev, {
+        id: mId,
+        role: isAI ? 'assistant' : 'user',
+        content: content,
+        sources,
+        suggestedQueries,
+        timestamp: new Date().toISOString(),
+        senderEmail: payload.senderEmail || sender 
+      }];
     });
   }, []);
 

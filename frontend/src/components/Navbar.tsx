@@ -9,26 +9,37 @@ import { useAuth } from "@/context/AuthContext";
 import { useSession } from "@/context/SessionContext";
 import { NewInsightModal } from "./NewInsightModal";
 import { useRouter } from "next/navigation";
+import { usePopover } from "@/context/PopoverContext";
+import { AlertTriangle } from "lucide-react";
 
 export function Navbar() {
   const { user } = useAuth();
   const { activeSession, terminateActiveSession } = useSession();
+  const { openPopover, closePopover } = usePopover();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isInsightModalOpen, setIsInsightModalOpen] = React.useState(false);
   const [showToast, setShowToast] = React.useState(false);
 
-  const handleTerminate = async (e: React.MouseEvent) => {
+  const handleTerminate = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (confirm("Terminate workspace? All associated records, documents, and collaborative connections will be permanently destroyed.")) {
-       try {
-         await terminateActiveSession();
-         router.push("/");
-       } catch (error: any) {
-         alert("Failed to terminate neural link.");
-       }
-    }
+    
+    openPopover({
+      anchor: "terminate",
+      title: "Confirm Neural Purge?",
+      description: "Executing this protocol will irreversibly destroy the active workspace and all associated semantic vectors.",
+      icon: <AlertTriangle size={24} className="text-rose-500" />,
+      action: async () => {
+        try {
+          await terminateActiveSession();
+          closePopover();
+          router.push("/workspaces");
+        } catch (error) {
+          console.error("Neural termination failed:", error);
+        }
+      }
+    });
   };
 
   const triggerComingSoon = () => {
@@ -101,15 +112,17 @@ export function Navbar() {
                   </div>
                 </div>
               </Link>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={handleTerminate} // Changed to use handleTerminate
-                className="w-10 h-10 rounded-xl text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all border border-transparent hover:border-red-500/20"
-                title="Terminate Workspace"
-              >
-                <X size={18} />
-              </Button>
+              <div className="relative">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleTerminate} 
+                  className="w-10 h-10 rounded-xl text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all border border-transparent"
+                  title="Terminate Workspace"
+                >
+                  <X size={18} />
+                </Button>
+              </div>
             </div>
           ) : (
             <Button 

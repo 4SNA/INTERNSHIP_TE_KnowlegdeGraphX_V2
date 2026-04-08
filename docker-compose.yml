@@ -1,54 +1,34 @@
+version: '3.8'
+
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: kgx_postgres
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: knowledgegraphx
+  postgres:
+    # ⚠️ CRITICAL: Upgraded from standard postgres:15 to pgvector/pgvector:pg15. 
+    # Standard Postgres 15 does NOT contain the vector matrix binaries required by KnowledgeGraphX!
+    image: pgvector/pgvector:pg15
+    container_name: postgres
     ports:
       - "5432:5432"
+    environment:
+      - POSTGRES_DB=knowledgegraphx
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - kgx-network
+    restart: unless-stopped
 
   redis:
-    image: redis:7-alpine
-    container_name: kgx_redis
-    restart: always
+    image: redis:7
+    container_name: redis
     ports:
       - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - kgx-network
+    restart: unless-stopped
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: kgx_backend
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/knowledgegraphx
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
-      - APP_JWTSECRET=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      - APP_AI_APIKEY=demo
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-volumes:
-  postgres_data:
+networks:
+  kgx-network:
+    driver: bridge

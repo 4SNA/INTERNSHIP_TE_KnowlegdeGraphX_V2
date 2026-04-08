@@ -17,6 +17,9 @@ import { SessionProvider } from "@/context/SessionContext";
 import { DocumentProvider } from "@/context/DocumentContext";
 import { ChatProvider } from "@/context/ChatContext";
 import { WebSocketProvider } from "@/context/WebSocketContext";
+import { PopoverProvider } from "@/context/PopoverContext";
+import { GlobalPopover } from "@/components/GlobalPopover";
+
 
 export default function RootLayout({
   children,
@@ -31,7 +34,10 @@ export default function RootLayout({
             <DocumentProvider>
               <ChatProvider>
                 <WebSocketProvider>
-                  {children}
+                  <PopoverProvider>
+                    {children}
+                    <GlobalPopover />
+                  </PopoverProvider>
                 </WebSocketProvider>
               </ChatProvider>
             </DocumentProvider>

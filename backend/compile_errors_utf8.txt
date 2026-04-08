@@ -1,0 +1,190 @@
+﻿mvn : WARNING: package 
+sun.misc not in java.base
+At line:1 char:1
++ mvn compile > 
+compile_errors.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo       
+       : NotSpecified:   
+  (WARNING: packag...o   
+ t in java.base:Strin    
+g) [], RemoteExcepti    
+on
+    + FullyQualifiedErro 
+   rId : NativeCommandE  
+  rror
+ 
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< com.knowledgegraphx:backend >---------------------
+[INFO] Building KnowledgeGraphX 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ backend ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 55 source files with javac [debug parameters release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[26,20] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[26,40] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[26,53] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[26,70] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,22] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,28] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,63] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,74] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,89] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,94] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,103] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,118] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[29,22] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,16] illegal character: '\ud83d\udd0d'
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,31] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,47] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,48] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,52] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,16] illegal character: '\ud83d\udcc8'
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,35] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,56] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,57] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,61] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,74] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,78] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,106] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,108] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,121] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,125] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,16] illegal character: '\ud83c\udfaf'
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,35] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,47] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,64] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,77] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,82] unclosed character literal
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,78] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,100] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,102] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,110] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,131] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,141] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,142] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,148] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,16] illegal character: '\u2728'
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,20] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,36] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,49] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,58] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,75] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,76] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,83] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,85] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,97] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,112] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,116] '(' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,121] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,128] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,137] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,144] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[35,21] ')' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[40,25] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,28] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,41] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,55] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,56] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,60] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,73] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[43,16] illegal text block open delimiter sequence, missing line terminator
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[43,18] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[43,31] ';' expected
+[INFO] 70 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.171 s
+[INFO] Finished at: 2026-03-30T18:29:25+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project backend: Compilation failure: Compilation failure: 
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[26,20] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[26,40] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[26,53] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[26,70] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,22] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,28] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,63] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,74] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,89] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,94] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,103] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[27,118] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[29,22] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,16] illegal character: '\ud83d\udd0d'
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,31] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,47] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,48] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[30,52] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,16] illegal character: '\ud83d\udcc8'
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,35] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,56] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,57] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,61] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,74] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,78] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,106] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,108] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,121] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[31,125] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,16] illegal character: '\ud83c\udfaf'
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,35] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,47] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,64] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,77] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,82] unclosed character literal
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,78] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,100] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,102] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,110] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,131] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,141] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,142] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[32,148] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,16] illegal character: '\u2728'
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,20] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,36] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,49] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,58] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,75] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,76] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,83] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,85] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,97] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,112] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,116] '(' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,121] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,128] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,137] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[33,144] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[35,21] ')' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[40,25] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,28] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,41] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,55] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,56] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,60] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[42,73] ';' expected
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[43,16] illegal text block open delimiter sequence, missing line terminator
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[43,18] not a statement
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryRewriter.java:[43,31] ';' expected
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

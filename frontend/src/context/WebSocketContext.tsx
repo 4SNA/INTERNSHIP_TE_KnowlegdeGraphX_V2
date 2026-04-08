@@ -7,20 +7,26 @@ import { useAuth } from './AuthContext';
 import { useSession } from './SessionContext';
 import { useChat } from './ChatContext';
 
+interface ActiveUser {
+  name: string;
+  avatarUrl?: string;
+  email?: string;
+}
+
 interface WebSocketContextType {
   connected: boolean;
-  activeUsers: string[];
+  activeUsers: ActiveUser[];
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [connected, setConnected] = useState(false);
-  const [activeUsers, setActiveUsers] = useState<string[]>([]);
+  const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
   const stompClient = useRef<Client | null>(null);
   const { user } = useAuth();
   const { activeSession } = useSession();
-  const { messages, sendMessage } = useChat(); // Note: We might need to append directly
+  const { receiveMessage } = useChat();
 
   const connect = useCallback(() => {
     if (stompClient.current?.active || !activeSession || !user) return;
@@ -49,6 +55,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         destination: `/app/chat.addUser/${activeSession.sessionId}`,
         body: JSON.stringify({
           sender: user.name,
+          senderEmail: user.email,
+          avatarUrl: user.avatarUrl,
           type: 'JOIN',
           sessionId: activeSession.sessionId
         }),
@@ -57,17 +65,17 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     client.onStompError = (frame) => {
       console.error('Broker reported error: ' + frame.headers['message']);
-      console.error('Additional details: ' + frame.body);
     };
 
     client.onDisconnect = () => {
+      setConnected(true); // actually false but let's keep logic simple for now
       setConnected(false);
       console.log('Disconnected from STOMP');
     };
 
     client.activate();
     stompClient.current = client;
-  }, [activeSession, user]);
+  }, [activeSession, user, receiveMessage]);
 
   const disconnect = useCallback(() => {
     if (stompClient.current) {
@@ -77,19 +85,31 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const { receiveMessage } = useChat();
-
   const handleIncomingMessage = (payload: any) => {
     console.log("Real-time payload received:", payload);
-    const { type, sender } = payload;
+    
+    // Support polymorphic payloads (Single JOIN event or Full Roster Array)
+    if (Array.isArray(payload)) {
+      const users: ActiveUser[] = payload.map((p: any) => ({
+        name: p.sender,
+        avatarUrl: p.avatarUrl,
+        email: p.senderEmail || p.sender // fallback
+      }));
+      setActiveUsers(users);
+      return;
+    }
+
+    const { type, sender, avatarUrl, senderEmail } = payload;
     
     if (type === 'JOIN' || type === 'USER_JOINED') {
       setActiveUsers(prev => {
-        if (!prev.includes(sender)) return [...prev, sender];
+        if (!prev.find(u => u.email === senderEmail || u.name === sender)) {
+          return [...prev, { name: sender, avatarUrl, email: senderEmail }];
+        }
         return prev;
       });
     } else if (type === 'LEAVE' || type === 'USER_LEFT') {
-      setActiveUsers(prev => prev.filter(u => u !== sender));
+      setActiveUsers(prev => prev.filter(u => u.name !== sender));
     } else {
       receiveMessage(payload);
     }

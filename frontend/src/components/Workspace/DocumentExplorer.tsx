@@ -91,7 +91,7 @@ export function DocumentExplorer() {
            </div>
          )}
 
-         {!loading && documents.map(doc => (
+         {!loading && Array.isArray(documents) && documents.map(doc => (
            <DocumentItem key={doc.id} name={doc.fileName} />
          ))}
       </div>

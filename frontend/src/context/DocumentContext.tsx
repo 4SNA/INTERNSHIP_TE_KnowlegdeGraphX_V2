@@ -39,9 +39,9 @@ export function DocumentProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     try {
       const docs = await documentApi.getAll(activeSession.sessionId);
-      setDocuments(docs);
+      setDocuments(Array.isArray(docs) ? docs : []);
     } catch (error) {
-      console.error("Failed to fetch documents:", error);
+      console.error("Neural Sync Failure: Failed to fetch documents.", error);
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,7 @@ export function DocumentProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     setUploading(true);
-    setUploadProgress(10); // Simulated start progress
+    setUploadProgress(10); 
     try {
       await documentApi.upload(file, activeSession.sessionId);
       setUploadProgress(100);

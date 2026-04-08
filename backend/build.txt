@@ -1,0 +1,625 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< com.knowledgegraphx:backend >---------------------
+[INFO] Building KnowledgeGraphX 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ backend ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 57 source files with javac [debug parameters release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[6,56] package dev.langchain4j.model.embedding.bge.small.en.v15 does not exist
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryService.java:[671,20] method pruneRedundantContent(java.lang.String) is already defined in class com.knowledgegraphx.backend.service.QueryService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[56,9] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[76,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[85,9] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[86,20] cannot find symbol
+  symbol:   class BgeSmallEnV15EmbeddingModel
+  location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[92,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[103,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/security/OAuth2SuccessHandler.java:[75,32] cannot find symbol
+  symbol:   method builder()
+  location: class com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/security/OAuth2SuccessHandler.java:[86,13] cannot find symbol
+  symbol:   method setLastLogin(java.time.LocalDateTime)
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/security/OAuth2SuccessHandler.java:[88,17] cannot find symbol
+  symbol:   method setAvatarUrl(java.lang.String)
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/security/OAuth2SuccessHandler.java:[92,50] cannot find symbol
+  symbol:   method getEmail()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[28,61] cannot find symbol
+  symbol:   method getEmail()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[33,23] cannot find symbol
+  symbol:   method getId()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[34,25] cannot find symbol
+  symbol:   method getFullName()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[35,26] cannot find symbol
+  symbol:   method getEmail()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[36,30] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[36,60] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[37,29] cannot find symbol
+  symbol:   method getProvider()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[47,55] cannot find symbol
+  symbol:   method getEmail()
+  location: variable request of type @jakarta.validation.Valid com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[52,23] cannot find symbol
+  symbol:   method getId()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[53,25] cannot find symbol
+  symbol:   method getFullName()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[54,26] cannot find symbol
+  symbol:   method getEmail()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[55,30] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[55,60] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[56,29] cannot find symbol
+  symbol:   method getProvider()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[67,32] cannot find symbol
+  symbol:   method getId()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[68,34] cannot find symbol
+  symbol:   method getFullName()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[69,35] cannot find symbol
+  symbol:   method getEmail()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[70,39] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[70,69] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[71,38] cannot find symbol
+  symbol:   method getProvider()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[90,23] cannot find symbol
+  symbol:   method getId()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[91,25] cannot find symbol
+  symbol:   method getFullName()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[92,26] cannot find symbol
+  symbol:   method getEmail()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[93,30] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[93,60] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[94,29] cannot find symbol
+  symbol:   method getProvider()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[28,49] cannot find symbol
+  symbol:   method getEmail()
+  location: variable request of type com.knowledgegraphx.backend.dto.RegisterRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[32,25] cannot find symbol
+  symbol:   method builder()
+  location: class com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[33,34] cannot find symbol
+  symbol:   method getFullName()
+  location: variable request of type com.knowledgegraphx.backend.dto.RegisterRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[34,31] cannot find symbol
+  symbol:   method getEmail()
+  location: variable request of type com.knowledgegraphx.backend.dto.RegisterRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[35,57] cannot find symbol
+  symbol:   method getPassword()
+  location: variable request of type com.knowledgegraphx.backend.dto.RegisterRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[44,64] cannot find symbol
+  symbol:   method getEmail()
+  location: variable request of type com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[44,84] cannot find symbol
+  symbol:   method getPassword()
+  location: variable request of type com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[48,55] cannot find symbol
+  symbol:   method getEmail()
+  location: variable request of type com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[49,13] cannot find symbol
+  symbol:   method setLastLogin(java.time.LocalDateTime)
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[52,45] cannot find symbol
+  symbol:   method getEmail()
+  location: variable request of type com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[68,20] cannot find symbol
+  symbol:   method getFullName()
+  location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[68,54] cannot find symbol
+  symbol:   method getFullName()
+  location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[69,37] cannot find symbol
+  symbol:   method getFullName()
+  location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[72,20] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[73,38] cannot find symbol
+  symbol:   method getAvatarUrl()
+  location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[42,66] cannot find symbol
+  symbol:   method getId()
+  location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[61,64] cannot find symbol
+  symbol:   method builder()
+  location: class com.knowledgegraphx.backend.dto.DocumentResponse
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[62,24] cannot find symbol
+  symbol:   method getId()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[63,30] cannot find symbol
+  symbol:   method getFileName()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[64,30] cannot find symbol
+  symbol:   method getFileType()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[65,30] cannot find symbol
+  symbol:   method getFileSize()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[66,31] cannot find symbol
+  symbol:   method getCreatedAt()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[55,17] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[58,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[86,37] cannot find symbol
+  symbol:   method builder()
+  location: class com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[100,115] cannot find symbol
+  symbol:   method getId()
+  location: variable savedDoc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[106,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[106,73] cannot find symbol
+  symbol:   method getFileName()
+  location: variable savedDoc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[113,39] cannot find symbol
+  symbol:   method getFilePath()
+  location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[114,35] cannot find symbol
+  symbol:   method getFileName()
+  location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[118,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[163,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[163,75] cannot find symbol
+  symbol:   method getFileName()
+  location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[185,22] cannot find symbol
+  symbol:   method getUploadedBy()
+  location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[191,52] cannot find symbol
+  symbol:   method getFilePath()
+  location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[195,38] cannot find symbol
+  symbol:   method getSession()
+  location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[200,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[200,69] cannot find symbol
+  symbol:   method getFileName()
+  location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[212,46] cannot find symbol
+  symbol:   method getFilePath()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[215,65] cannot find symbol
+  symbol:   method getSession()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[215,91] cannot find symbol
+  symbol:   method getId()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[219,17] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[219,74] cannot find symbol
+  symbol:   method getFileName()
+  location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[39,9] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[48,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[49,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[50,13] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[57,21] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[59,21] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[61,21] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[64,17] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[73,9] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[102,9] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[105,9] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[108,14] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[137,9] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[143,9] cannot find symbol
+  symbol:   variable log
+  location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[34,34] cannot find symbol
+  symbol:   method builder()
+  location: class com.knowledgegraphx.backend.model.Session
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[42,46] cannot find symbol
+  symbol:   method builder()
+  location: class com.knowledgegraphx.backend.model.SessionUser
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[65,46] cannot find symbol
+  symbol:   method builder()
+  location: class com.knowledgegraphx.backend.model.SessionUser
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[85,21] cannot find symbol
+  symbol:   method getCreatedBy()
+  location: variable session of type com.knowledgegraphx.backend.model.Session
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[85,56] cannot find symbol
+  symbol:   method getId()
+  location: variable user of type com.knowledgegraphx.backend.model.User
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.709 s
+[INFO] Finished at: 2026-04-06T17:45:07+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project backend: Compilation failure: Compilation failure: 
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[6,56] package dev.langchain4j.model.embedding.bge.small.en.v15 does not exist
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/QueryService.java:[671,20] method pruneRedundantContent(java.lang.String) is already defined in class com.knowledgegraphx.backend.service.QueryService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[56,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[76,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[85,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[86,20] cannot find symbol
+[ERROR]   symbol:   class BgeSmallEnV15EmbeddingModel
+[ERROR]   location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[92,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/config/AiConfig.java:[103,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.config.AiConfig
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/security/OAuth2SuccessHandler.java:[75,32] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/security/OAuth2SuccessHandler.java:[86,13] cannot find symbol
+[ERROR]   symbol:   method setLastLogin(java.time.LocalDateTime)
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/security/OAuth2SuccessHandler.java:[88,17] cannot find symbol
+[ERROR]   symbol:   method setAvatarUrl(java.lang.String)
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/security/OAuth2SuccessHandler.java:[92,50] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[28,61] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[33,23] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[34,25] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[35,26] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[36,30] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[36,60] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[37,29] cannot find symbol
+[ERROR]   symbol:   method getProvider()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[47,55] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable request of type @jakarta.validation.Valid com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[52,23] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[53,25] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[54,26] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[55,30] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[55,60] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[56,29] cannot find symbol
+[ERROR]   symbol:   method getProvider()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[67,32] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[68,34] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[69,35] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[70,39] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[70,69] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[71,38] cannot find symbol
+[ERROR]   symbol:   method getProvider()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[90,23] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[91,25] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[92,26] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[93,30] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[93,60] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/AuthController.java:[94,29] cannot find symbol
+[ERROR]   symbol:   method getProvider()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[28,49] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.RegisterRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[32,25] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[33,34] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.RegisterRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[34,31] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.RegisterRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[35,57] cannot find symbol
+[ERROR]   symbol:   method getPassword()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.RegisterRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[44,64] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[44,84] cannot find symbol
+[ERROR]   symbol:   method getPassword()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[48,55] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[49,13] cannot find symbol
+[ERROR]   symbol:   method setLastLogin(java.time.LocalDateTime)
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[52,45] cannot find symbol
+[ERROR]   symbol:   method getEmail()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.LoginRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[68,20] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[68,54] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[69,37] cannot find symbol
+[ERROR]   symbol:   method getFullName()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[72,20] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/AuthService.java:[73,38] cannot find symbol
+[ERROR]   symbol:   method getAvatarUrl()
+[ERROR]   location: variable request of type com.knowledgegraphx.backend.dto.ProfileUpdateRequest
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[42,66] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[61,64] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.knowledgegraphx.backend.dto.DocumentResponse
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[62,24] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[63,30] cannot find symbol
+[ERROR]   symbol:   method getFileName()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[64,30] cannot find symbol
+[ERROR]   symbol:   method getFileType()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[65,30] cannot find symbol
+[ERROR]   symbol:   method getFileSize()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/controller/DocumentController.java:[66,31] cannot find symbol
+[ERROR]   symbol:   method getCreatedAt()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[55,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[58,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[86,37] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[100,115] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable savedDoc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[106,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[106,73] cannot find symbol
+[ERROR]   symbol:   method getFileName()
+[ERROR]   location: variable savedDoc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[113,39] cannot find symbol
+[ERROR]   symbol:   method getFilePath()
+[ERROR]   location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[114,35] cannot find symbol
+[ERROR]   symbol:   method getFileName()
+[ERROR]   location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[118,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[163,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[163,75] cannot find symbol
+[ERROR]   symbol:   method getFileName()
+[ERROR]   location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[185,22] cannot find symbol
+[ERROR]   symbol:   method getUploadedBy()
+[ERROR]   location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[191,52] cannot find symbol
+[ERROR]   symbol:   method getFilePath()
+[ERROR]   location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[195,38] cannot find symbol
+[ERROR]   symbol:   method getSession()
+[ERROR]   location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[200,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[200,69] cannot find symbol
+[ERROR]   symbol:   method getFileName()
+[ERROR]   location: variable document of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[212,46] cannot find symbol
+[ERROR]   symbol:   method getFilePath()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[215,65] cannot find symbol
+[ERROR]   symbol:   method getSession()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[215,91] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[219,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.DocumentService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/DocumentService.java:[219,74] cannot find symbol
+[ERROR]   symbol:   method getFileName()
+[ERROR]   location: variable doc of type com.knowledgegraphx.backend.model.Document
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[39,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[48,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[49,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[50,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[57,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[59,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[61,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[64,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[73,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[102,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[105,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[108,14] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[137,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/VectorSearchService.java:[143,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.knowledgegraphx.backend.service.VectorSearchService
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[34,34] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.knowledgegraphx.backend.model.Session
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[42,46] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.knowledgegraphx.backend.model.SessionUser
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[65,46] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.knowledgegraphx.backend.model.SessionUser
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[85,21] cannot find symbol
+[ERROR]   symbol:   method getCreatedBy()
+[ERROR]   location: variable session of type com.knowledgegraphx.backend.model.Session
+[ERROR] /D:/KnowledgeGraphX/backend/src/main/java/com/knowledgegraphx/backend/service/SessionService.java:[85,56] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable user of type com.knowledgegraphx.backend.model.User
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

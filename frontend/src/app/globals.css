@@ -14,13 +14,14 @@
   --color-zinc-100: #f4f4f5;
   --color-zinc-50: #fafafa;
 
-  --color-indigo-500: #6366f1;
-  --color-indigo-400: #818cf8;
-  --color-indigo-600: #4f46e5;
-  --color-purple-500: #a855f7;
-  --color-purple-600: #9333ea;
+  --color-indigo-500: #0ea5e9; /* Peacock Sky */
+  --color-indigo-400: #38bdf8;
+  --color-indigo-600: #0284c7;
+  --color-purple-500: #0d9488; /* Blue-Green / Teal */
+  --color-purple-600: #0f766e;
   --color-cyan-500: #06b6d4;
   --color-cyan-400: #22d3ee;
+  --color-peacock: #0e7490;
   
   --color-emerald-500: #10b981;
   --color-emerald-400: #34d399;
@@ -56,7 +57,7 @@
     @apply bg-zinc-950/60 backdrop-blur-2xl border border-zinc-800/60 shadow-[0_0_100px_rgba(0,0,0,0.5)];
   }
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-emerald-400 to-cyan-400;
   }
   
   /* CUSTOM SCROLLBAR REFINEMENT */
@@ -78,6 +79,38 @@
   /* ACCESSIBLE FOCUS STATES */
   .focus-ring {
     @apply focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all outline-none;
+  }
+
+  /* HIDE SCROLLBAR */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* MARKDOWN BODY OVERRIDES */
+  .markdown-body {
+    @apply text-zinc-300 leading-relaxed;
+  }
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3 {
+    @apply text-zinc-100 font-bold;
+  }
+  .markdown-body code {
+    @apply font-mono;
+  }
+  .markdown-body table {
+    @apply w-full border-collapse;
+  }
+  .markdown-body th {
+    @apply text-left font-bold text-indigo-400 uppercase tracking-wider text-xs;
+  }
+  .markdown-body td,
+  .markdown-body th {
+    @apply px-3 py-2 border border-zinc-800;
   }
 }
 

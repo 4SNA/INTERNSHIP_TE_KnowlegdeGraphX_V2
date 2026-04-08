@@ -23,5 +23,10 @@ export const sessionApi = {
 
   terminateSession: async (code: string): Promise<void> => {
     await axiosInstance.delete(`/session/${code}`);
+  },
+
+  getReport: async (sessionId: number): Promise<string> => {
+    const response = await axiosInstance.get(`/session/${sessionId}/report`);
+    return response.data.report;
   }
 };

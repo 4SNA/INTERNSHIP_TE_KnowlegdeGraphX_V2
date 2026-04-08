@@ -4,9 +4,8 @@ export const documentApi = {
   upload: async (file: File, sessionId: number) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('sessionId', sessionId.toString());
 
-    return axiosInstance.post('/documents/upload', formData, {
+    return axiosInstance.post(`/documents/upload?sessionId=${sessionId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
