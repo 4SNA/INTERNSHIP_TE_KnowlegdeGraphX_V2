@@ -47,12 +47,10 @@ export default function SessionWorkspace({ params }: { params: Promise<{ id: str
 
   // Sync session state with URL on refresh
   React.useEffect(() => {
-    if (!activeSession || activeSession.sessionCode !== id) {
-       if (id) {
-         joinSession(id).catch(err => {
-           console.error("Neural sync failed for URL parameter:", err);
-         });
-       }
+    if (id && (!activeSession || activeSession.sessionCode !== id)) {
+        joinSession(id).catch(err => {
+          console.error("Neural sync failed for URL parameter:", err);
+        });
     }
   }, [id, activeSession, joinSession]);
 
@@ -109,7 +107,7 @@ export default function SessionWorkspace({ params }: { params: Promise<{ id: str
                     <span className="px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Active Workspace</span>
                  </div>
                  <div className="flex items-center gap-2 mt-0.5 group cursor-pointer" onClick={handleCopyCode}>
-                    <span className="text-sm font-bold text-indigo-400 font-mono tracking-tighter uppercase">{sessionId}</span>
+                    <span className="text-sm font-bold text-indigo-400 font-mono tracking-tighter uppercase">{activeSession?.sessionCode || id || "Initializing..."}</span>
                     <button className="text-zinc-600 hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100"><Copy size={12} /></button>
                  </div>
               </div>

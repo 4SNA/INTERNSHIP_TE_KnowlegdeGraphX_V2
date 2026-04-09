@@ -61,6 +61,7 @@ app:
   jwtSecret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   jwtExpirationMs: 86400000 # 24 hours
   frontendUrl: ${FRONTEND_URL:http://localhost:3000}
+  upload-dir: ${UPLOAD_DIR:D:/KnowledgeGraphX/uploads}
 
 ollama:
   base-url: ${OLLAMA_BASE_URL:http://localhost:11434}

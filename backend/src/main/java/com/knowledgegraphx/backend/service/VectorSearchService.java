@@ -79,14 +79,14 @@ public class VectorSearchService {
         
         log.info("Neural Hybrid Hub: Initiating dual-stage scan (Semantic + Keyword) for: '{}'", normalizedQuery);
 
-        // Phase 1: Wide Semantic Recall (Recall pool of 30 fragments for higher variety)
+        // Phase 1: Wide Semantic Recall (Recall pool of 50 fragments for higher variety)
         Embedding queryEmbedding = embeddingModel.embed(query).content();
         Filter metadataFilter = new IsEqualTo("sessionId", sessionId.toString());
         
         EmbeddingSearchRequest searchRequest = EmbeddingSearchRequest.builder()
                 .queryEmbedding(queryEmbedding)
                 .filter(metadataFilter)
-                .maxResults(30) 
+                .maxResults(50) 
                 .minScore(0.55) 
                 .build();
                 
@@ -98,7 +98,7 @@ public class VectorSearchService {
             double score;
             ScoredSegment(TextSegment s, double sc) { this.segment = s; this.score = sc; }
         }
-
+ 
         List<ScoredSegment> scoredSegments = new ArrayList<>();
         for (EmbeddingMatch<TextSegment> match : semanticMatches) {
             double semanticScore = match.score();
@@ -106,14 +106,14 @@ public class VectorSearchService {
             double weightedScore = (semanticScore * 0.6) + (keywordBoost * 0.4);
             scoredSegments.add(new ScoredSegment(match.embedded(), weightedScore));
         }
-
+ 
         // Phase 3: Rank by Hybrid Score & Apply Quality Gate (0.65 threshold)
         scoredSegments.sort((a, b) -> Double.compare(b.score, a.score));
-
-        // Phase 4: Final Selection (Absorb top high-fidelity fragments up to 8)
+ 
+        // Phase 4: Final Selection (Absorb top high-fidelity fragments up to requested limit)
         List<TextSegment> finalResults = scoredSegments.stream()
-                .filter(s -> s.score >= 0.55) // Optimized quality gate for local LLMs
-                .limit(8)                    // Increased from 3 to 8 for better RAG context
+                .filter(s -> s.score >= 0.50) // Optimized quality gate for local LLMs
+                .limit(limit)                 
                 .map(s -> s.segment)
                 .collect(Collectors.toList());
         

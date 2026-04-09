@@ -95,7 +95,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         const assistantMessage: Message = {
           id: data.messageId || (Date.now() + 1).toString(),
           role: 'assistant',
-          content: data.answer,
+          content: data.answer || "",
           sources: data.sources,
           suggestedQueries: data.suggestedQueries,
           timestamp: new Date().toISOString()
@@ -139,7 +139,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           return [...prev, {
             id: mId,
             role: 'assistant',
-            content: content,
+            content: content || "",
             timestamp: new Date().toISOString()
           }];
         }
@@ -173,7 +173,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       return [...prev, {
         id: mId,
         role: isAI ? 'assistant' : 'user',
-        content: content,
+        content: content || "",
         sources,
         suggestedQueries,
         timestamp: new Date().toISOString(),

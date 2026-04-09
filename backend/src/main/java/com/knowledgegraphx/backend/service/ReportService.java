@@ -21,9 +21,9 @@ public class ReportService {
     public String generateSessionReport(Long sessionId) {
         log.info("Neural Synthesis: Generating executive intelligence summary for session {}", sessionId);
 
-        // 1. Fetch key segments from the session (up to 20 for context)
-        List<TextSegment> segments = vectorSearchService.searchRelevantChunks("key insights summaries summary research",
-                sessionId, 20);
+        // 1. Fetch key segments from the session (up to 50 for comprehensive coverage)
+        List<TextSegment> segments = vectorSearchService.searchRelevantChunks("key insights summaries summary research overview findings metrics",
+                sessionId, 50);
 
         if (segments.isEmpty()) {
             return "# Session Report\n\nNo document intelligence has been ingested yet for this session.";

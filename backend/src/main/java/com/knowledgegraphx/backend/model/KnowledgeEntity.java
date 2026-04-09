@@ -27,10 +27,15 @@ public class KnowledgeEntity {
     @Column(columnDefinition = "TEXT")
     private String context;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "document_id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "document_entities",
+        joinColumns = @JoinColumn(name = "entity_id"),
+        inverseJoinColumns = @JoinColumn(name = "document_id")
+    )
     @com.fasterxml.jackson.annotation.JsonIgnore
-    private Document document;
+    @Builder.Default
+    private java.util.Set<Document> documents = new java.util.HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id")

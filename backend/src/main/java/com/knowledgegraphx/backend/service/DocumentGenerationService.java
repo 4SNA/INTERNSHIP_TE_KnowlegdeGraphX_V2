@@ -43,20 +43,20 @@ public class DocumentGenerationService {
         // Gather workspace intelligence
         List<TextSegment> segments = List.of();
         try {
-            segments = vectorSearchService.searchRelevantChunks(prompt, sessionId, 12);
+            segments = vectorSearchService.searchRelevantChunks(prompt, sessionId, 30);
         } catch (Exception e) {
             log.warn("Document Generator: Vector search unavailable, continuing with entities.");
         }
-
+ 
         String context = segments.stream()
                 .map(TextSegment::text)
                 .collect(Collectors.joining("\n\n---\n\n"));
-
+ 
         List<com.knowledgegraphx.backend.model.KnowledgeEntity> entities =
                 knowledgeEntityRepository.findBySessionId(sessionId);
         String entityContext = entities.stream()
                 .map(e -> String.format("- %s [%s]: %s", e.getName(), e.getType(), e.getContext()))
-                .limit(30)
+                .limit(50)
                 .collect(Collectors.joining("\n"));
 
         List<com.knowledgegraphx.backend.model.Document> docs = documentRepository.findBySessionId(sessionId);

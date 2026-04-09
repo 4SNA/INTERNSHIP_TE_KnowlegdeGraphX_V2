@@ -50,6 +50,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     try {
       const data = await sessionApi.join(code);
+      console.log("Neural Sync: Session data received:", data);
+      
+      if (!data.sessionId || !data.sessionCode) {
+        throw new Error("Neural Sync: Received malformed session packet.");
+      }
+      
       setActiveSession(data);
       localStorage.setItem('activeSession', JSON.stringify(data));
     } catch (error) {

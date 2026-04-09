@@ -58,7 +58,23 @@ public class DocumentService {
         }
     }
 
-    private final Path root = Paths.get("uploads");
+    @org.springframework.beans.factory.annotation.Value("${app.upload-dir}")
+    private String uploadDir;
+
+    private Path root;
+
+    @javax.annotation.PostConstruct
+    public void init() {
+        this.root = Paths.get(uploadDir);
+        try {
+            if (!Files.exists(root)) {
+                Files.createDirectories(root);
+                log.info("Neural Registry: Initialized upload root at {}", root.toAbsolutePath());
+            }
+        } catch (IOException e) {
+            log.error("Neural Registry: CRITICAL ERROR - Could not initialize upload root: {}", e.getMessage());
+        }
+    }
 
     @Transactional
     public Document uploadDocument(MultipartFile file, Long sessionId, String userEmail) throws IOException {
@@ -97,7 +113,7 @@ public class DocumentService {
         java.util.concurrent.CompletableFuture.runAsync(() -> {
             try {
                 String extractedText = extractText(savedDoc);
-                
+                log.info("Neural Sync: Extracted {} characters of intelligence from {}", extractedText.length(), savedDoc.getFileName());
                 // Phase A: Semantic Indexing (Vector) - Handled sequentially to prevent Ollama Model Memory Thrashing
                 try {
                     vectorSearchService.ingestDocument(extractedText, sessionId, savedDoc.getId(), savedDoc.getFileName());

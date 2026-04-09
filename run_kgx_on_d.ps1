@@ -21,6 +21,8 @@ $env:APPDATA = "$envDir\AppData\Roaming"
 $env:TEMP = $tmpDir
 $env:TMP = $tmpDir
 $env:OLLAMA_MODELS = "D:\ollama\models"
+$env:HF_HOME = "$projectRoot\cache\huggingface"
+$env:TRANSFORMERS_CACHE = "$projectRoot\cache\huggingface"
 
 # ENFORCE JAVA 17 COMPATIBILITY
 if (Test-Path "C:\Program Files\Java\jdk-17") {
@@ -37,7 +39,7 @@ $env:PGPASSWORD = "password"
 
 # 2. FILE SYSTEM PREPARATION
 Write-Host "[1/7] Initializing Workspace Isolators..." -ForegroundColor White
-$dirs = @($envDir, $tmpDir, $repoDir, $npmCache, "$envDir\AppData\Local", "$envDir\AppData\Roaming", "$projectRoot\uploads", "$projectRoot\data\postgres", "$projectRoot\data\redis")
+$dirs = @($envDir, $tmpDir, $repoDir, $npmCache, "$envDir\AppData\Local", "$envDir\AppData\Roaming", "$projectRoot\uploads", "$projectRoot\data\postgres", "$projectRoot\data\redis", "$projectRoot\cache\huggingface")
 foreach($dir in $dirs) { if(!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null } }
 Write-Host "   ✅ High-capacity filesystem prepared on D:." -ForegroundColor Green
 

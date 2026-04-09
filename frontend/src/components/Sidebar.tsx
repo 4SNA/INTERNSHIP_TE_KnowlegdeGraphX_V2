@@ -148,7 +148,7 @@ export function Sidebar() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse-slow" />
-                  <code className="text-sm font-bold text-indigo-400 tracking-wider">#{activeSession.sessionCode}</code>
+                  <code className="text-sm font-bold text-indigo-400 tracking-wider">#{activeSession.sessionCode || "SYNCING"}</code>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-600 uppercase">
                   <Users size={12} />

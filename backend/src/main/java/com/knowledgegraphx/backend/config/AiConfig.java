@@ -54,7 +54,7 @@ public class AiConfig {
         return dev.langchain4j.model.ollama.OllamaChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
                 .modelName("mistral")
-                .temperature(0.7)
+                .temperature(0.4) // Focused precision
                 .timeout(Duration.ofSeconds(120))
                 .build();
     }
@@ -66,7 +66,7 @@ public class AiConfig {
         return dev.langchain4j.model.ollama.OllamaChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
                 .modelName("mistral")
-                .temperature(0.7)
+                .temperature(0.4) // Focused precision
                 .timeout(Duration.ofSeconds(300))
                 .build();
     }
@@ -77,7 +77,7 @@ public class AiConfig {
         return dev.langchain4j.model.ollama.OllamaStreamingChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
                 .modelName("mistral")
-                .temperature(0.7)
+                .temperature(0.4) // Focused precision
                 .timeout(Duration.ofSeconds(120))
                 .build();
     }
@@ -89,7 +89,7 @@ public class AiConfig {
         return dev.langchain4j.model.ollama.OllamaStreamingChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
                 .modelName("mistral")
-                .temperature(0.7)
+                .temperature(0.4) // Focused precision
                 .timeout(Duration.ofSeconds(300))
                 .build();
     }

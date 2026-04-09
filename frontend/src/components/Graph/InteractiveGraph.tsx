@@ -40,10 +40,12 @@ export function InteractiveGraph() {
   const [zoom, setZoom] = React.useState(1);
   const [loading, setLoading] = React.useState(true);
   const [draggingId, setDraggingId] = React.useState<string | null>(null);
-  const [offset, setOffset] = React.useState({ x: 0, y: 0 });
-
+  const [viewOffset, setViewOffset] = React.useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = React.useState(false);
+  const [panStart, setPanStart] = React.useState({ x: 0, y: 0 });
   const [analysisResults, setAnalysisResults] = React.useState<string[]>([]);
   const [analyzing, setAnalyzing] = React.useState(false);
+  const [offset, setOffset] = React.useState({ x: 0, y: 0 });
 
   const fetchGraph = React.useCallback(async () => {
     if (!activeSession) return;
@@ -57,12 +59,18 @@ export function InteractiveGraph() {
           return;
       }
 
-      const docNodes = data.nodes.filter((n: any) => n.type === 'document');
+      const docNodes = data.nodes.filter((n: any) => n.type === 'document').sort((a: any, b: any) => a.label.localeCompare(b.label));
       
+      const docCount = Math.max(1, docNodes.length);
+      const r = 280 + (docCount * 25); 
+      
+      // Calculate initial center based on container size (approx 1000x800)
+      const centerX = 500;
+      const centerY = 400;
+
       const docsWithPos = docNodes.map((n: any, i: number) => {
-         const angle = (i / Math.max(1, docNodes.length)) * 2 * Math.PI;
-         const r = 220; 
-         return { ...n, x: 500 + r * Math.cos(angle), y: 350 + r * Math.sin(angle) };
+         const angle = (i / docCount) * 2 * Math.PI;
+         return { ...n, x: centerX + r * Math.cos(angle), y: centerY + r * Math.sin(angle) };
       });
 
       const processedNodes = data.nodes.map((node: any) => {
@@ -73,11 +81,17 @@ export function InteractiveGraph() {
          const parent = parentEdge ? docsWithPos.find((d: any) => d.id === parentEdge.source) : null;
          
          if (parent) {
-            const angle = Math.random() * 2 * Math.PI;
-            const dist = 140 + Math.random() * 60;
+            const indexInGroup = data.edges.filter((e: any) => e.source === parent.id).findIndex((e: any) => e.target === node.id);
+            const totalInGroup = data.edges.filter((e: any) => e.source === parent.id).length;
+            const parentAngle = Math.atan2(parent.y - centerY, parent.x - centerX);
+            
+            const angleSpread = Math.PI / 1.5;
+            const angle = parentAngle - (angleSpread / 2) + ((indexInGroup + 0.5) / Math.max(1, totalInGroup)) * angleSpread;
+            const dist = 160 + (indexInGroup % 3) * 45; 
+            
             return { ...node, x: parent.x + dist * Math.cos(angle), y: parent.y + dist * Math.sin(angle) };
          }
-         return { ...node, x: 500 + 400 * Math.cos(Math.random()), y: 350 + 400 * Math.sin(Math.random()) };
+         return { ...node, x: centerX + 400 * Math.cos(Math.random() * 2 * Math.PI), y: centerY + 400 * Math.sin(Math.random() * 2 * Math.PI) };
       });
       
       setNetwork({ ...data, nodes: processedNodes });
@@ -87,6 +101,12 @@ export function InteractiveGraph() {
       setLoading(false);
     }
   }, [activeSession]);
+
+  const resetView = React.useCallback(() => {
+    setViewOffset({ x: 0, y: 0 });
+    setZoom(1);
+    fetchGraph();
+  }, [fetchGraph]);
 
   React.useEffect(() => {
     fetchGraph();
@@ -112,12 +132,19 @@ export function InteractiveGraph() {
     }
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 0 && !draggingId) {
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - viewOffset.x, y: e.clientY - viewOffset.y });
+    }
+  };
+
   const handleNodeDragStart = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     setDraggingId(id);
     const node = network.nodes.find(n => n.id === id);
     if (node) {
-      setOffset({ x: e.clientX / zoom - (node.x || 0), y: e.clientY / zoom - (node.y || 0) });
+      setOffset({ x: e.clientX / zoom - node.x, y: e.clientY / zoom - node.y });
     }
   };
 
@@ -130,20 +157,32 @@ export function InteractiveGraph() {
         ...prev,
         nodes: prev.nodes.map(n => n.id === draggingId ? { ...n, x: newX, y: newY } : n)
       }));
+    } else if (isPanning) {
+      setViewOffset({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      });
     }
   };
 
-  const handleMouseUp = () => setDraggingId(null);
+  const handleMouseUp = () => {
+    setDraggingId(null);
+    setIsPanning(false);
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type?.toLowerCase()) {
       case 'document': return <FileText size={18} />;
       case 'person': 
       case 'people': return <User size={18} />;
+      case 'organization':
+      case 'institution': return <Building2 size={18} />;
+      case 'skill':
       case 'subject': return <Network size={18} />;
-      case 'marks': return <Sparkles size={18} />;
+      case 'marks':
+      case 'metric': return <Sparkles size={18} />;
+      case 'experience': return <Share2 size={18} />;
       case 'identifier': return <Maximize2 size={18} />;
-      case 'organization': return <Building2 size={18} />;
       case 'concept': return <Lightbulb size={18} />;
       case 'topic':
       case 'keyword': return <Tag size={18} />;
@@ -154,20 +193,32 @@ export function InteractiveGraph() {
   const getTypeColor = (type: string) => {
     switch (type?.toLowerCase()) {
       case 'document': return 'bg-zinc-900 border-zinc-700 text-indigo-400';
-      case 'person':
-      case 'people': return 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400';
+      case 'person': return 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400';
+      case 'organization':
+      case 'institution': return 'bg-blue-500/10 border-blue-500/30 text-blue-400';
+      case 'skill':
       case 'subject': return 'bg-violet-500/10 border-violet-500/30 text-violet-400';
-      case 'marks': return 'bg-rose-500/10 border-rose-500/30 text-rose-400';
+      case 'marks':
+      case 'metric': return 'bg-rose-500/10 border-rose-500/30 text-rose-400';
+      case 'experience': return 'bg-orange-500/10 border-orange-500/30 text-orange-400';
       case 'identifier': return 'bg-amber-500/10 border-amber-500/30 text-amber-400';
-      case 'topic':
-      case 'keyword': return 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400';
       default: return 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400';
     }
   };
 
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const filteredNodes = network.nodes.filter(n => 
+    n.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    n.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div 
-      className="relative w-full h-full bg-zinc-950 border border-zinc-900 rounded-[40px] overflow-hidden select-none shadow-2xl glass overscroll-none flex"
+      className={cn(
+        "relative w-full h-full bg-zinc-950 border border-zinc-900 rounded-[40px] overflow-hidden select-none shadow-2xl glass overscroll-none flex",
+        isPanning ? "cursor-grabbing" : "cursor-default"
+      )}
+      onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
@@ -184,6 +235,7 @@ export function InteractiveGraph() {
         />
 
         <svg className="absolute inset-0 w-full h-full pointer-events-none">
+          <g style={{ transform: `translate(${viewOffset.x}px, ${viewOffset.y}px) scale(${zoom})` }} className="transition-transform duration-75">
           <defs>
             <filter id="nodeGlow">
               <feGaussianBlur stdDeviation="3" result="blur" />
@@ -203,42 +255,44 @@ export function InteractiveGraph() {
             if (!source || !target || source.x === undefined || source.y === undefined || target.x === undefined || target.y === undefined) return null;
             
             const isHighlighted = activeNodeId === source.id || activeNodeId === target.id;
+            const isDocBridge = source.type === 'document' && target.type === 'document';
             
-            const x1 = source.x * zoom;
-            const y1 = source.y * zoom;
-            const x2 = target.x * zoom;
-            const y2 = target.y * zoom;
+            const x1 = source.x;
+            const y1 = source.y;
+            const x2 = target.x;
+            const y2 = target.y;
             
             const midX = (x1 + x2) / 2;
             const midY = (y1 + y2) / 2;
             const dx = x2 - x1;
             const dy = y2 - y1;
             const len = Math.sqrt(dx * dx + dy * dy);
-            const normX = dy / len;
-            const normY = -dx / len;
-            const qX = midX + normX * 30; 
-            const qY = midY + normY * 30;
+            const normX = dy / (len || 1);
+            const normY = -dx / (len || 1);
+            const qX = isDocBridge ? midX : midX + normX * 25; 
+            const qY = isDocBridge ? midY : midY + normY * 25;
 
             return (
               <g key={`edge-${idx}`}>
                 <path
-                  d={`M ${x1} ${y1} Q ${qX} ${qY} ${x2} ${y2}`}
-                  stroke={isHighlighted ? "#6366f1" : "#27272a"}
-                  strokeWidth={isHighlighted ? 2.5 : 1}
+                  d={isDocBridge ? `M ${x1} ${y1} L ${x2} ${y2}` : `M ${x1} ${y1} Q ${qX} ${qY} ${x2} ${y2}`}
+                  stroke={isDocBridge ? "#6366f1" : (isHighlighted ? "#6366f1" : "#27272a")}
+                  strokeWidth={isDocBridge ? 3 : (isHighlighted ? 2 : 0.8)}
+                  strokeDasharray={isDocBridge ? "8,4" : "0"}
                   fill="none"
-                  markerEnd={isHighlighted ? "url(#arrowhead-active)" : "url(#arrowhead)"}
-                  className="transition-all duration-300"
-                  opacity={isHighlighted ? 0.9 : 0.2}
+                  markerEnd={isHighlighted || isDocBridge ? "url(#arrowhead-active)" : "url(#arrowhead)"}
+                  className={cn("transition-all duration-300", isDocBridge && "animate-pulse")}
+                  opacity={isHighlighted || isDocBridge ? 1 : 0.15}
                 />
-                {isHighlighted && (
+                {(isHighlighted || isDocBridge) && (
                   <text
                     x={qX}
                     y={qY - 10}
-                    fill="#818cf8"
-                    fontSize="9"
+                    fill={isDocBridge ? "#818cf8" : "#6366f1"}
+                    fontSize={isDocBridge ? "10" : "8"}
                     fontWeight="black"
                     textAnchor="middle"
-                    className="drop-shadow-lg uppercase tracking-widest bg-zinc-950"
+                    className="drop-shadow-lg uppercase tracking-widest"
                   >
                     {edge.label}
                   </text>
@@ -246,22 +300,23 @@ export function InteractiveGraph() {
               </g>
             );
           })}
+          </g>
         </svg>
 
         <div 
-          className="absolute inset-0 w-full h-full transition-transform duration-300"
-          style={{ transform: `scale(${zoom})` }}
+          className="absolute inset-0 w-full h-full transition-transform duration-75"
+          style={{ transform: `translate(${viewOffset.x}px, ${viewOffset.y}px) scale(${zoom})` }}
         >
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-zinc-700 animate-pulse">
                <Brain size={48} className="text-indigo-500 animate-bounce" />
                <p className="text-[10px] font-black uppercase tracking-[0.4em]">Calibrating Neural Synapses...</p>
             </div>
-          ) : network.nodes.map((node) => (
+          ) : filteredNodes.map((node) => (
             <div 
               key={node.id}
               className={cn(
-                "absolute -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing transition-all duration-300",
+                "absolute -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing transition-all duration-200",
                 draggingId === node.id ? "scale-110 z-[60]" : "scale-100 hover:scale-105 z-10",
                 activeNodeId === node.id && "z-50"
               )}
@@ -272,22 +327,18 @@ export function InteractiveGraph() {
               onClick={() => setSelectedNode(node)}
             >
               <div className={cn(
-                "w-24 h-24 rounded-[32px] flex items-center justify-center border transition-all shadow-2xl relative",
+                "w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all shadow-xl relative group/node",
                 getTypeColor(node.type),
-                activeNodeId === node.id && "ring-4 ring-indigo-500/20 border-indigo-400 bg-zinc-950 scale-110"
+                activeNodeId === node.id && "ring-4 ring-indigo-500/30 border-indigo-400 bg-zinc-950 scale-110",
+                node.type === 'document' ? "bg-zinc-900" : "rounded-full"
               )}>
                  {getTypeIcon(node.type)}
-                 {node.type === 'document' && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-zinc-950">
-                       <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
-                    </div>
-                 )}
               </div>
               <div className={cn(
-                "mt-3 px-4 py-2 rounded-2xl border backdrop-blur-3xl transition-all text-[11px] font-bold uppercase tracking-widest whitespace-nowrap shadow-xl",
+                "mt-2 px-3 py-1.5 rounded-xl border backdrop-blur-3xl transition-all text-[10px] font-black uppercase tracking-tighter whitespace-nowrap shadow-lg",
                 activeNodeId === node.id 
-                  ? "bg-indigo-500 text-white border-indigo-400 translate-y-1" 
-                  : "bg-zinc-900/80 border-zinc-800/50 text-zinc-400"
+                  ? "bg-indigo-600 text-white border-indigo-500" 
+                  : "bg-zinc-900/90 border-zinc-800 text-zinc-300"
               )}>
                  {node.label}
               </div>
@@ -296,12 +347,19 @@ export function InteractiveGraph() {
         </div>
 
         <div className="absolute top-8 left-8 flex items-center gap-3">
-           <Card className="flex items-center gap-1 p-1 bg-zinc-900/40 border-zinc-800/40 backdrop-blur-2xl rounded-[20px] shadow-2xl">
-              <button onClick={() => setZoom(z => Math.min(2, z + 0.1))} className="p-3 rounded-2xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"><ZoomIn size={18} /></button>
-              <button onClick={() => setZoom(z => Math.max(0.5, z - 0.1))} className="p-3 rounded-2xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"><ZoomOut size={18} /></button>
+           <Card className="flex items-center gap-1 p-1.5 bg-zinc-900/60 border-zinc-800/60 backdrop-blur-2xl rounded-[24px] shadow-2xl">
+              <input 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search neural tokens..."
+                className="bg-zinc-950 border border-zinc-800/50 rounded-xl px-4 py-2 text-[10px] font-bold text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 w-44 transition-all"
+              />
+              <div className="w-[1px] h-6 bg-zinc-800 mx-1" />
+              <button onClick={() => setZoom(z => Math.min(2, z + 0.1))} className="p-2.5 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"><ZoomIn size={16} /></button>
+              <button onClick={() => setZoom(z => Math.max(0.5, z - 0.1))} className="p-2.5 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"><ZoomOut size={16} /></button>
            </Card>
-           <Button onClick={() => fetchGraph()} variant="ghost" className="bg-zinc-900/40 border-zinc-800/40 backdrop-blur-2xl rounded-[20px] h-11 px-6 text-[10px] uppercase font-black tracking-widest text-zinc-400">
-              <Maximize2 size={14} className="mr-3" /> Auto Layout
+           <Button onClick={() => resetView()} variant="ghost" className="bg-zinc-900/60 border-zinc-800/60 backdrop-blur-2xl rounded-[24px] h-12 px-6 text-[10px] uppercase font-black tracking-widest text-zinc-400 hover:text-white transition-all">
+              <Maximize2 size={14} className="mr-3 text-indigo-500" /> Auto Layout
            </Button>
         </div>
       </div>

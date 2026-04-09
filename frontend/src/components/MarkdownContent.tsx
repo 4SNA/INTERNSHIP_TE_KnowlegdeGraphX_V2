@@ -22,6 +22,7 @@ export function MarkdownContent({ content, className }: MarkdownContentProps) {
     setTimeout(() => setCopiedBlock(null), 2000);
   };
 
+  if (!content) return null;
   const parts = content.split(/(```[\s\S]*?```)/g);
   let codeBlockIdx = 0;
 

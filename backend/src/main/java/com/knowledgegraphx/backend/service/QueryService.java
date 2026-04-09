@@ -105,7 +105,7 @@ public class QueryService {
         for (TextSegment s : segments) {
             String fp = s.text().toLowerCase().replaceAll("[^a-z0-9]", "");
             if (fingerprints.add(fp)) unique.add(s);
-            if (unique.size() >= 5) break; 
+            if (unique.size() >= 10) break; // Increased context depth for 100% accuracy
         }
 
         String answer = null;
@@ -117,12 +117,13 @@ public class QueryService {
             String graphContext = getGraphIntelligenceContext(normalizedQuery, sessionId, unique);
             
             // Step 3: Neural Synthesis
-            broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Synthesizing Answer...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
+            broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Synthesizing Cross-Doc Intelligence...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
             
             // Start streaming (clear the status indicator)
             broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.STREAM_CHUNK, messageId, null, userEmail);
             
-            answer = getSynthesizedAnswerFast(normalizedQuery, history, unique, sessionId, graphContext, docManifest, messageId, userEmail);
+            // USE rewrittenQuery instead of normalizedQuery for synthesis to avoid losing punctuation/casing
+            answer = getSynthesizedAnswerFast(rewrittenQuery, history, unique, sessionId, graphContext, docManifest, messageId, userEmail);
             if (answer != null) answer = pruneRedundantContent(answer);
             
             try { 
@@ -166,13 +167,29 @@ public class QueryService {
         String context = Objects.requireNonNull(segs).stream().map(TextSegment::text).collect(Collectors.joining("\n\n"));
         String hBuffer = buildHistoryBuffer(hist);
         
-        String system = "Persona: KnowledgeGraphX Omniscient Strategic Partner. You possess 200% accuracy intelligence. " +
-                       "Your primary goal is to synthesize the absolute truth from the provided RESEARCH_CONTEXT or your vast pre-trained knowledge if the context is sparse. " +
-                       "Instruction: Be extremely direct. Use professional analytical tone. Structure complexity with markdown. " +
-                       "Cite specific assets from the KNOWLEDGE_MANIFEST if referenced. Never apologize. Never say 'As an AI'. " +
-                       "Execute the synthesis with maximum clinical precision.";
+        String system = "You are the KnowledgeGraphX Strategic Hub. You are an elite research analyst capable of 100% document retrieval and understanding.\n\n" +
+                       "OPERATIONAL DIRECTIVES:\n" +
+                       "1. EVIDENCE-FIRST REASONING: Your answers MUST be justifiable based on the provided RESEARCH_CONTEXT and NEURAL_GRAPH.\n" +
+                       "2. MULTI-DOC SYNTHESIS: Actively look for patterns, contradictions, or confirmations across multiple documents in the manifest.\n" +
+                       "3. SOURCE CITATIONS: When using specific data, cite the document name in brackets like [DocName.pdf].\n" +
+                       "4. ZERO FLUFF: Do not use introductory phrases. Start with the most important data.\n" +
+                       "5. TECHNICAL AUTHORITY: Use bolding for key entities and formatted lists for structured insights. Be clinical and precise.";
         
-        String user = String.format("RESEARCH_CONTEXT:\n%s\n\nKNOWLEDGE_MANIFEST:\n%s\n\nNEURAL_GRAPH:\n%s\n\nHISTORICAL_CONTEXT:\n%s\n\nQUERY:\n%s\n\nAnalyze and Respond with Intelligence Grade v4.0.", context, manifest, graph, hBuffer, q);
+        String user = String.format("""
+            ### KNOWLEDGE_MANIFEST (Active Workspace):
+            %s
+            
+            ### NEURAL_GRAPH (Known Entities):
+            %s
+            
+            ### RESEARCH_CONTEXT (Verified Data Fragments):
+            %s
+            
+            ### USER_QUERY:
+            %s
+            
+            Research Directive: Synthesize all available evidence. Be clinical, justifiable, and exhaustive.
+            """, manifest, graph, context, q);
         
         CompletableFuture<String> response = new CompletableFuture<>();
         StringBuilder full = new StringBuilder();
@@ -184,7 +201,7 @@ public class QueryService {
         try {
             llama3StreamingModel.generate(List.of(SystemMessage.from(system), UserMessage.from(user)), handler);
             return response.get(180, TimeUnit.SECONDS);
-        } catch (Exception e) { return "CRITICAL ERROR: Intelligence Engine Pulsing. Synthesis Timed Out."; }
+        } catch (Exception e) { return "CRITICAL ERROR: Neural Synthesis interrupted. The response was too large or computation timed out."; }
     }
 
     private String buildHistoryBuffer(List<QueryHistory> history) {
@@ -210,7 +227,8 @@ public class QueryService {
 
     private String pruneRedundantContent(String text) {
         if (text == null) return null;
-        String cleaned = text.replaceAll("(?i)(as an ai|based on context|understood|here is the|please let me know|i analyzed)", "").trim();
+        // Refined pruning: Only remove specific robotic markers that leak through
+        String cleaned = text.replaceAll("(?i)(as an ai assistant|based on the provided context|i don't have enough information|here is what I found)", "").trim();
         String[] lines = cleaned.split("\n");
         Set<String> unique = new LinkedHashSet<>();
         StringBuilder sb = new StringBuilder();
@@ -239,5 +257,9 @@ public class QueryService {
                 .type(t).content(c).sender(snd).senderEmail(senderEmail).sessionId(s).messageId(m).suggestedQueries(sug).build());
     }
 
-    private String normalizeQuery(String q) { return q != null ? q.toLowerCase().trim().replaceAll("[^a-z0-9\\s]", "") : ""; }
+    private String normalizeQuery(String q) { 
+        if (q == null) return "";
+        // Clean whitespace but keep semantic symbols for vector search
+        return q.trim().toLowerCase().replaceAll("\\s+", " ").replaceAll("[^a-z0-9\\+\\-\\*\\/\\s\\?]", "");
+    }
 }
