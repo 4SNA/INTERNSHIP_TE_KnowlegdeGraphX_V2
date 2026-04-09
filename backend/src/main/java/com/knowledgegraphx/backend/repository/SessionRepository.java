@@ -10,6 +10,4 @@ import java.util.Optional;
 public interface SessionRepository extends JpaRepository<Session, Long> {
     Optional<Session> findBySessionCode(String sessionCode);
     Boolean existsBySessionCode(String sessionCode);
-
-    Optional<Session> findById(Long id);
 }

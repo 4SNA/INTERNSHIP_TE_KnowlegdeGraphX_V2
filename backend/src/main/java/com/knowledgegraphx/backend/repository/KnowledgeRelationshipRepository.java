@@ -13,4 +13,6 @@ public interface KnowledgeRelationshipRepository extends JpaRepository<Knowledge
     
     @org.springframework.transaction.annotation.Transactional
     void deleteBySessionId(Long sessionId);
+
+    boolean existsBySourceIdAndTargetIdAndRelationType(Long sourceId, Long targetId, String relationType);
 }

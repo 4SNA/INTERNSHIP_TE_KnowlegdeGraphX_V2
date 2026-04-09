@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/query")
@@ -30,7 +30,10 @@ public class QueryController {
             return ResponseEntity.badRequest().body("Invalid sessionId");
         }
 
-        com.knowledgegraphx.backend.dto.QueryResponse responseBody = queryService.performQuery(question, sessionId, email);
+        com.knowledgegraphx.backend.dto.QueryResponse responseBody = queryService.performQuery(
+                Objects.requireNonNull(question),
+                Objects.requireNonNull(sessionId),
+                Objects.requireNonNull(email));
         
         return ResponseEntity.ok(responseBody);
     }

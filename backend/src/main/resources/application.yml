@@ -14,7 +14,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -22,7 +22,7 @@ spring:
   
   cache:
     type: redis
-
+ 
   data:
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
@@ -50,19 +50,19 @@ spring:
               - read:user
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-name: GitHub
-
+ 
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-
+ 
 # JWT Configuration
 app:
   jwtSecret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   jwtExpirationMs: 86400000 # 24 hours
   frontendUrl: ${FRONTEND_URL:http://localhost:3000}
   upload-dir: ${UPLOAD_DIR:D:/KnowledgeGraphX/uploads}
-
+ 
 ollama:
   base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
   model: ${OLLAMA_MODEL:llama3}

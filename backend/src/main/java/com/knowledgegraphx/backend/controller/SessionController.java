@@ -73,7 +73,10 @@ public class SessionController {
     }
 
     @DeleteMapping("/{code}")
-    public ResponseEntity<Void> terminateSession(@PathVariable String code, Authentication authentication) {
+    public ResponseEntity<?> terminateSession(@PathVariable String code, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Unauthorized: Authentication required to terminate a session.");
+        }
         String email = authentication.getName();
         sessionService.terminateSession(code, email);
         return ResponseEntity.noContent().build();

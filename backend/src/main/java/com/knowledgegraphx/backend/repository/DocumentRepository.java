@@ -10,4 +10,5 @@ import java.util.List;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<Document> findBySessionId(Long sessionId);
     List<Document> findByUploadedById(Long userId);
+    long countBySessionId(Long sessionId);
 }

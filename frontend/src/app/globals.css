@@ -15,16 +15,18 @@
   --color-zinc-50: #fafafa;
 
   /* BRAND PALETTE - BLUE BLUE */
-  --color-indigo-500: #2563eb; /* Pure Vibrant Blue */
+  --color-indigo-500: #2563eb;
+  /* Pure Vibrant Blue */
   --color-indigo-400: #60a5fa;
   --color-indigo-600: #1d4ed8;
-  
+
   /* BRAND PALETTE - GREEN PEACOCK */
-  --color-purple-500: #0d9488; /* Vibrant Teal/Peacock */
+  --color-purple-500: #0d9488;
+  /* Vibrant Teal/Peacock */
   --color-purple-600: #0f766e;
   --color-peacock: #0e7490;
   --color-peacock-light: #22d3ee;
-  
+
   --color-emerald-500: #10b981;
   --color-emerald-400: #34d399;
   --color-amber-500: #f59e0b;
@@ -37,7 +39,7 @@
   --color-foreground: var(--color-zinc-100);
   --color-border: rgba(39, 39, 42, 0.4);
   --color-card-bg: rgba(10, 10, 12, 0.6);
-  
+
   /* TYPOGRAPHY */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
@@ -46,6 +48,7 @@
   * {
     @apply border-border outline-none;
   }
+
   body {
     @apply bg-background text-foreground selection:bg-primary/30 antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -56,25 +59,30 @@
   .glass {
     @apply bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/40 shadow-2xl;
   }
+
   .glass-panel {
     @apply bg-zinc-950/60 backdrop-blur-2xl border border-zinc-800/60 shadow-[0_0_100px_rgba(0,0,0,0.5)];
   }
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-emerald-400 to-peacock-light;
   }
-  
+
   /* CUSTOM SCROLLBAR REFINEMENT */
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: var(--color-zinc-800) transparent;
   }
+
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
+
   .custom-scrollbar::-webkit-scrollbar-track {
     @apply bg-transparent;
   }
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-zinc-800 rounded-full hover:bg-zinc-700 transition-colors;
   }
@@ -89,6 +97,7 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -97,20 +106,25 @@
   .markdown-body {
     @apply text-zinc-300 leading-relaxed;
   }
+
   .markdown-body h1,
   .markdown-body h2,
   .markdown-body h3 {
     @apply text-zinc-100 font-bold;
   }
+
   .markdown-body code {
     @apply font-mono;
   }
+
   .markdown-body table {
     @apply w-full border-collapse;
   }
+
   .markdown-body th {
     @apply text-left font-bold text-indigo-400 uppercase tracking-wider text-xs;
   }
+
   .markdown-body td,
   .markdown-body th {
     @apply px-3 py-2 border border-zinc-800;
@@ -119,20 +133,49 @@
 
 /* ANIMATION SUITE */
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 0.3; transform: scale(1.05); }
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.3;
+    transform: scale(1.05);
+  }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes slide-up {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.animate-pulse-slow { animation: pulse-slow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-.animate-spin-slow { animation: spin-slow 12s linear infinite; }
-.animate-slide-up { animation: slide-up 0.5s ease-out forwards; }
+.animate-pulse-slow {
+  animation: pulse-slow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}

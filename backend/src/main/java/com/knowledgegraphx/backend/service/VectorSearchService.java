@@ -61,9 +61,9 @@ public class VectorSearchService {
             }
 
             try {
-                Embedding embedding = embeddingModel.embed(segment).content();
-                if (embedding != null && embedding.dimension() > 0) {
-                    embeddingStore.add(embedding, segment);
+                dev.langchain4j.model.output.Response<Embedding> response = embeddingModel.embed(segment);
+                if (response != null && response.content() != null && response.content().dimension() > 0) {
+                    embeddingStore.add(response.content(), segment);
                 } else {
                     log.error("CRITICAL FALLBACK: Generated an empty vector model for node {}", i);
                 }

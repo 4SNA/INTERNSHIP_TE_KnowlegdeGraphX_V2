@@ -57,6 +57,12 @@ public class DocumentController {
         return ResponseEntity.ok(responses);
     }
 
+    @PostMapping("/reindex/{sessionId}")
+    public ResponseEntity<String> reindex(@PathVariable Long sessionId) {
+        documentService.reindexDocuments(sessionId);
+        return ResponseEntity.ok("Neural Sync: Re-indexing task initiated for session " + sessionId);
+    }
+
     private com.knowledgegraphx.backend.dto.DocumentResponse convertToResponse(Document doc) {
         return com.knowledgegraphx.backend.dto.DocumentResponse.builder()
                 .id(doc.getId())

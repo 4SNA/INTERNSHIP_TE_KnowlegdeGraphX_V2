@@ -3,12 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  BarChart3, 
-  FileText, 
-  Network, 
-  Users, 
-  History, 
+import {
+  BarChart3,
+  FileText,
+  Network,
+  Users,
+  History,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -29,12 +29,12 @@ interface SidebarItemProps {
 
 function SidebarItem({ icon: Icon, label, href, active, collapsed }: SidebarItemProps) {
   return (
-    <Link 
+    <Link
       href={href}
       className={cn(
         "w-full h-11 px-3 rounded-xl flex items-center transition-all cursor-pointer group mb-1.5 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
-        active 
-          ? "bg-indigo-500/10 border border-indigo-500/15 text-indigo-400 font-bold" 
+        active
+          ? "bg-indigo-500/10 border border-indigo-500/15 text-indigo-400 font-bold"
           : "text-zinc-500 hover:text-zinc-100 hover:bg-zinc-900 border border-transparent"
       )}
       title={collapsed ? label : undefined}
@@ -90,7 +90,7 @@ export function Sidebar() {
   ];
 
   return (
-    <aside 
+    <aside
       className={cn(
         "h-[calc(100vh-64px)] shrink-0 border-r border-zinc-900/40 bg-zinc-950/40 backdrop-blur-md hidden lg:flex flex-col p-4 sticky top-16 z-40 transition-all duration-500 ease-in-out",
         isCollapsed ? "w-20" : "w-72"
@@ -101,7 +101,7 @@ export function Sidebar() {
         {/* Navigation Section */}
         <div className="space-y-1">
           {menuItems.map((item) => (
-            <SidebarItem 
+            <SidebarItem
               key={item.href}
               icon={item.icon}
               label={item.label}
@@ -116,8 +116,8 @@ export function Sidebar() {
         {!isCollapsed && (
           <div className="space-y-4 px-1">
             <h3 className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest px-2">Workspaces</h3>
-            
-            <button 
+
+            <button
               onClick={handleCreate}
               disabled={loading}
               className="w-full h-10 px-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold text-xs hover:bg-indigo-500/20 transition-all flex items-center gap-2 group"
@@ -127,7 +127,7 @@ export function Sidebar() {
             </button>
 
             <form onSubmit={handleJoin} className="relative group/join">
-              <input 
+              <input
                 type="text"
                 placeholder="Join by code..."
                 value={joinCode}
@@ -161,14 +161,14 @@ export function Sidebar() {
       </div>
 
       <div className="mt-auto pt-4 space-y-2 border-t border-zinc-900/60">
-        <SidebarItem 
-          icon={Settings} 
-          label="Settings" 
-          href="/settings" 
-          active={pathname === "/settings"} 
-          collapsed={isCollapsed} 
+        <SidebarItem
+          icon={Settings}
+          label="Settings"
+          href="/settings"
+          active={pathname === "/settings"}
+          collapsed={isCollapsed}
         />
-        <button 
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="w-full h-11 px-3 rounded-xl flex items-center text-zinc-600 hover:text-white hover:bg-zinc-900 transition-all border border-transparent group"
           aria-expanded={!isCollapsed}

@@ -143,7 +143,7 @@ export function InteractiveGraph() {
     e.stopPropagation();
     setDraggingId(id);
     const node = network.nodes.find(n => n.id === id);
-    if (node) {
+    if (node && node.x !== undefined && node.y !== undefined) {
       setOffset({ x: e.clientX / zoom - node.x, y: e.clientY / zoom - node.y });
     }
   };

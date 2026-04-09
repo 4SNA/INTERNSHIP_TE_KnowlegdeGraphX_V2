@@ -3,7 +3,6 @@ package com.knowledgegraphx.backend.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -48,7 +47,8 @@ public class Document {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(mappedBy = "documents")
     @com.fasterxml.jackson.annotation.JsonIgnore
-    private java.util.List<KnowledgeEntity> entities;
+    @Builder.Default
+    private java.util.Set<KnowledgeEntity> entities = new java.util.HashSet<>();
 }

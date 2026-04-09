@@ -52,7 +52,7 @@ public class NeuralReRanker {
                     .map(Integer::parseInt)
                     .filter(idx -> idx >= 0 && idx < candidates.size())
                     .limit(finalLimit)
-                    .map(candidates::get)
+                    .map(idx -> candidates.get(idx))
                     .collect(Collectors.toList());
 
         } catch (Exception e) {

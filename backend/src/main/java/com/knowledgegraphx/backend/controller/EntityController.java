@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 @RestController
 @RequestMapping("/api/entities")
@@ -16,7 +17,7 @@ public class EntityController {
     private final KnowledgeEntityRepository knowledgeEntityRepository;
 
     @GetMapping("/session/{sessionId}")
-    public ResponseEntity<List<KnowledgeEntity>> getSessionEntities(@PathVariable Long sessionId) {
+    public ResponseEntity<List<KnowledgeEntity>> getSessionEntities(@PathVariable @NonNull Long sessionId) {
         return ResponseEntity.ok(knowledgeEntityRepository.findBySessionId(sessionId));
     }
 
@@ -25,7 +26,7 @@ public class EntityController {
     private final com.knowledgegraphx.backend.service.DocumentService documentService;
 
     @PostMapping("/reindex/{documentId}")
-    public ResponseEntity<Void> reindexDocument(@PathVariable Long documentId) {
+    public ResponseEntity<Void> reindexDocument(@PathVariable @NonNull Long documentId) {
         documentRepository.findById(documentId).ifPresent(doc -> {
             String text = documentService.extractText(doc);
             entityExtractionService.extractAndSaveEntities(doc, text);

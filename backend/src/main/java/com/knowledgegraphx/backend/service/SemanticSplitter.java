@@ -4,6 +4,7 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.output.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,7 @@ import java.util.List;
 /**
  * KnowledgeGraphX Semantic Processor
  * 
- * Implements a high-fidelity intelligence splitting strategy that uses 
- * vector divergence (cosine similarity) to detect topic shifts instead of 
- * arbitrary character counting.
+ * Implemented with high-fidelity intelligence splitting and null-safe embedding gates.
  */
 @Service
 @Slf4j
@@ -25,24 +24,15 @@ public class SemanticSplitter {
 
     private final EmbeddingModel embeddingModel;
 
-    /**
-     * Splits a document into semantic clusters.
-     * 
-     * @param document The source document
-     * @param targetChunkSize The ideal chunk size in characters (approximate)
-     * @param similarityThreshold Threshold below which a topic shift is detected (0.0 to 1.0)
-     * @return List of TextSegments with intact metadata
-     */
     public List<TextSegment> split(Document document, int targetChunkSize, double similarityThreshold) {
         String text = document.text();
         String docName = document.metadata().getString("fileName");
         
-        // 1. Structural Phase: Split by logical blocks (paragraphs)
         String[] paragraphs = text.split("\\n+");
         List<TextSegment> finalSegments = new ArrayList<>();
-        List<String> windowBuffer = new ArrayList<>(); // For overlap
+        List<String> windowBuffer = new ArrayList<>();
 
-        log.info("Neural Splitter: Processing {} base paragraphs for semantic clustering [Doc: {}].", paragraphs.length, docName);
+        log.info("Neural Splitter: Semantic assessment of {} fragments for [Doc: {}].", paragraphs.length, docName);
 
         StringBuilder currentCluster = new StringBuilder();
         Embedding currentClusterEmbedding = null;
@@ -52,7 +42,6 @@ public class SemanticSplitter {
             String cleanPara = paragraph.trim();
             if (cleanPara.isEmpty()) continue;
 
-            // Heading Detection: Simple heuristic (short, no ending punctuation)
             if (cleanPara.length() < 100 && !cleanPara.matches(".*[.!?]$")) {
                 currentHeading = cleanPara;
             }
@@ -62,30 +51,31 @@ public class SemanticSplitter {
 
             for (String sentence : sentences) {
                 if (currentCluster.length() == 0) {
-                    // Initialize with current heading if available
                     if (!currentHeading.isEmpty() && !sentence.contains(currentHeading)) {
                         currentCluster.append("[").append(currentHeading).append("] ");
                     }
                     currentCluster.append(sentence);
-                    currentClusterEmbedding = embeddingModel.embed(sentence).content();
+                    currentClusterEmbedding = getSafeEmbedding(sentence);
                     windowBuffer.add(sentence);
                 } else {
-                    Embedding sentenceEmbedding = embeddingModel.embed(sentence).content();
-                    double similarity = calculateCosineSimilarity(currentClusterEmbedding, sentenceEmbedding);
+                    Embedding sentenceEmbedding = getSafeEmbedding(sentence);
                     
-                    boolean topicShift = similarity < similarityThreshold;
+                    boolean topicShift = false;
+                    if (currentClusterEmbedding != null && sentenceEmbedding != null) {
+                        double similarity = calculateCosineSimilarity(currentClusterEmbedding, sentenceEmbedding);
+                        topicShift = similarity < similarityThreshold;
+                    }
+                    
                     boolean sizeThresholdReached = currentCluster.length() + sentence.length() > targetChunkSize;
 
                     if (topicShift || sizeThresholdReached) {
-                        // CLOSE CLUSTER
                         finalSegments.add(TextSegment.from(currentCluster.toString().trim(), document.metadata().copy()));
                         
-                        // OVERLAP LOGIC: Retain last ~15% for context continuity
                         StringBuilder overlap = new StringBuilder();
                         if (!currentHeading.isEmpty()) overlap.append("[").append(currentHeading).append("] ");
                         
-                        int overlapCount = Math.max(1, windowBuffer.size() / 6); // approx 15%
-                        List<String> tail = windowBuffer.subList(Math.max(0, windowBuffer.size() - overlapCount), windowBuffer.size());
+                        int overlapCount = Math.max(1, windowBuffer.size() / 6);
+                        List<String> tail = new ArrayList<>(windowBuffer.subList(Math.max(0, windowBuffer.size() - overlapCount), windowBuffer.size()));
                         for (String s : tail) overlap.append(s).append(" ");
                         
                         currentCluster = new StringBuilder(overlap.toString());
@@ -98,25 +88,39 @@ public class SemanticSplitter {
                     } else {
                         currentCluster.append(" ").append(sentence);
                         windowBuffer.add(sentence);
-                        // Expensive full-text re-embedding avoided; using moving average for stability
-                        currentClusterEmbedding = averageEmbeddings(currentClusterEmbedding, sentenceEmbedding);
+                        if (currentClusterEmbedding != null && sentenceEmbedding != null) {
+                            currentClusterEmbedding = averageEmbeddings(currentClusterEmbedding, sentenceEmbedding);
+                        } else if (sentenceEmbedding != null) {
+                            currentClusterEmbedding = sentenceEmbedding;
+                        }
                     }
                 }
             }
         }
 
-        // Flush final cluster
         if (currentCluster.length() > 0) {
             finalSegments.add(TextSegment.from(currentCluster.toString().trim(), document.metadata().copy()));
         }
 
-        log.info("Neural Synthesis: Generated {} context-rich semantic chunks.", finalSegments.size());
+        log.info("Neural Synthesis: Generated {} context-rich semantic nodes.", finalSegments.size());
         return finalSegments;
+    }
+
+    private Embedding getSafeEmbedding(String text) {
+        try {
+            Response<Embedding> resp = embeddingModel.embed(text);
+            return (resp != null) ? resp.content() : null;
+        } catch (Exception e) {
+            log.warn("Neural Splitter: Semantic blip detected during vector mapping. Neutralizing gate.");
+            return null;
+        }
     }
 
     private Embedding averageEmbeddings(Embedding e1, Embedding e2) {
         float[] v1 = e1.vector();
         float[] v2 = e2.vector();
+        if (v1 == null || v2 == null) return e1; // Fallback
+        
         float[] avg = new float[v1.length];
         for (int i = 0; i < v1.length; i++) {
             avg[i] = (v1[i] + v2[i]) / 2.0f;
@@ -124,10 +128,7 @@ public class SemanticSplitter {
         return new Embedding(avg);
     }
 
-
     private List<String> splitIntoSentences(String text) {
-        // Robust regex for sentence splitting in academic and technical text
-        // Looks for terminators (.!?) followed by space/newline and uppercase char
         String[] parts = text.split("(?<=[.!?])\\s+(?=[A-Z])");
         List<String> result = new ArrayList<>();
         for (String p : parts) {
@@ -138,8 +139,11 @@ public class SemanticSplitter {
     }
 
     private double calculateCosineSimilarity(Embedding e1, Embedding e2) {
+        if (e1 == null || e2 == null) return 0;
         float[] v1 = e1.vector();
         float[] v2 = e2.vector();
+        if (v1.length != v2.length) return 0;
+        
         double dotProduct = 0;
         double norm1 = 0;
         double norm2 = 0;

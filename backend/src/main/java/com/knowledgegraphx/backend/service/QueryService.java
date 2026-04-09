@@ -93,12 +93,9 @@ public class QueryService {
         
         List<com.knowledgegraphx.backend.model.Document> workspaceDocs = documentRepository.findBySessionId(sessionId);
         
-        // Step 1: Initialize Neural Registry
-        broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Initializing Neural Registry...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
-
-        // Step 2: Context Retrieval
-        List<TextSegment> segments = vectorSearchService.searchRelevantChunks(normalizedQuery, sessionId, 10);
-        broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Scanning Workspace Manifest...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
+        // Context Retrieval & Synthesis
+        broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Scanning Workspace...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
+        List<TextSegment> segments = vectorSearchService.searchRelevantChunks(normalizedQuery, sessionId, 8);
 
         List<TextSegment> unique = new ArrayList<>();
         Set<String> fingerprints = new HashSet<>();
@@ -116,10 +113,7 @@ public class QueryService {
             String docManifest = workspaceDocs.stream().map(com.knowledgegraphx.backend.model.Document::getFileName).collect(Collectors.joining("\n"));
             String graphContext = getGraphIntelligenceContext(normalizedQuery, sessionId, unique);
             
-            // Step 3: Neural Synthesis
-            broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Synthesizing Cross-Doc Intelligence...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
-            
-            // Start streaming (clear the status indicator)
+            // Start streaming immediately
             broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.STREAM_CHUNK, messageId, null, userEmail);
             
             // USE rewrittenQuery instead of normalizedQuery for synthesis to avoid losing punctuation/casing
@@ -142,6 +136,7 @@ public class QueryService {
         broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", answer, com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE, messageId, suggestions, userEmail);
     }
 
+    @SuppressWarnings("unused")
     private QueryType classifyQuery(String question) {
         String prompt = "Classify: FACTUAL, SUMMARY, COMPARISON, CODING, GENERAL, METADATA. Query: \"" + question + "\". Word only.";
         try {
@@ -151,6 +146,7 @@ public class QueryService {
         return QueryType.FACTUAL;
     }
 
+    @SuppressWarnings("unused")
     private String generateResearchPlan(String q, List<TextSegment> segs, String graph, QueryType t, String c, String history) {
         String prompt = String.format("""
             SYSTEM PLANNER: ARCHITECT MODE.
@@ -165,7 +161,7 @@ public class QueryService {
 
     private String getSynthesizedAnswerFast(String q, List<QueryHistory> hist, List<TextSegment> segs, Long sid, String graph, String manifest, String mid, String userEmail) {
         String context = Objects.requireNonNull(segs).stream().map(TextSegment::text).collect(Collectors.joining("\n\n"));
-        String hBuffer = buildHistoryBuffer(hist);
+        buildHistoryBuffer(hist); // history buffer for future context injection
         
         String system = "You are the KnowledgeGraphX Strategic Hub. You are an elite research analyst capable of 100% document retrieval and understanding.\n\n" +
                        "OPERATIONAL DIRECTIVES:\n" +
@@ -200,7 +196,7 @@ public class QueryService {
         };
         try {
             llama3StreamingModel.generate(List.of(SystemMessage.from(system), UserMessage.from(user)), handler);
-            return response.get(180, TimeUnit.SECONDS);
+            return response.get(300, TimeUnit.SECONDS);
         } catch (Exception e) { return "CRITICAL ERROR: Neural Synthesis interrupted. The response was too large or computation timed out."; }
     }
 
@@ -209,7 +205,7 @@ public class QueryService {
     }
 
     private void broadcastStreamingChunk(Long sid, String chunk, String mid, String userEmail) {
-        messagingTemplate.convertAndSend("/topic/session/" + sid, com.knowledgegraphx.backend.dto.ChatMessage.builder()
+        com.knowledgegraphx.backend.dto.ChatMessage message = com.knowledgegraphx.backend.dto.ChatMessage.builder()
                 .type(com.knowledgegraphx.backend.dto.ChatMessage.MessageType.STREAM_CHUNK)
                 .content(chunk)
                 .sender("KnowledgeGraphX AI")
@@ -217,7 +213,10 @@ public class QueryService {
                 .sessionId(sid)
                 .messageId(mid)
                 .isStreaming(true)
-                .build());
+                .build();
+        if (message != null) {
+            messagingTemplate.convertAndSend("/topic/session/" + sid, message);
+        }
     }
 
     private String getGraphIntelligenceContext(String q, Long sid, List<TextSegment> segs) {
@@ -236,30 +235,39 @@ public class QueryService {
         return sb.toString().trim();
     }
 
-    private String handleGeneralQuery(String q, int count) { return mistralChatModel.generate("Greet researcher. " + count + " docs active. Query: " + q); }
-    private String generateMetadataResponse(List<com.knowledgegraphx.backend.model.Document> docs, String q) { return "Audit: " + (docs != null ? docs.stream().map(com.knowledgegraphx.backend.model.Document::getFileName).collect(Collectors.joining(", ")) : "No docs"); }
     private List<String> generateNeuralSuggestions(String q, String a) { return List.of("Detail finding 1.", "Source audit.", "Next steps."); }
+    @SuppressWarnings("unused")
+    private String handleGeneralQuery(String q, int count) { return mistralChatModel.generate("Greet researcher. " + count + " docs active. Query: " + q); }
+    @SuppressWarnings("unused")
+    private String generateMetadataResponse(List<com.knowledgegraphx.backend.model.Document> docs, String q) { return "Audit: " + (docs != null ? docs.stream().map(com.knowledgegraphx.backend.model.Document::getFileName).collect(Collectors.joining(", ")) : "No docs"); }
+    @SuppressWarnings("unused")
     private String resolveDocName(String id) { try { return documentRepository.findById(Long.parseLong(id)).map(com.knowledgegraphx.backend.model.Document::getFileName).orElse("Res " + id); } catch (Exception e) { return "Fragm"; } }
     
     @Transactional 
     protected void archiveQuery(String q, String r, String e, Long s, List<String> sug) {
         try { 
             User u = userRepository.findByEmail(e).orElse(null); 
-            Session sess = sessionRepository.findById(s).orElse(null);
+            Session sess = sessionRepository.findById(Objects.requireNonNull(s)).orElse(null);
             if (u != null && sess != null) {
-                queryHistoryRepository.save(QueryHistory.builder().question(q).response(r).user(u).session(sess).suggestedQueries(String.join(";", sug)).build());
+                QueryHistory history = QueryHistory.builder().question(q).response(r).user(u).session(sess).suggestedQueries(String.join(";", sug)).build();
+                if (history != null) {
+                    queryHistoryRepository.save(history);
+                }
             }
         } catch (Exception ignore) {}
     }
 
     private void broadcastMessageWithId(Long s, String snd, String c, com.knowledgegraphx.backend.dto.ChatMessage.MessageType t, String m, List<String> sug, String senderEmail) {
-        messagingTemplate.convertAndSend("/topic/session/" + s, com.knowledgegraphx.backend.dto.ChatMessage.builder()
-                .type(t).content(c).sender(snd).senderEmail(senderEmail).sessionId(s).messageId(m).suggestedQueries(sug).build());
+        com.knowledgegraphx.backend.dto.ChatMessage message = com.knowledgegraphx.backend.dto.ChatMessage.builder()
+                .type(t).content(c).sender(snd).senderEmail(senderEmail).sessionId(s).messageId(m).suggestedQueries(sug).build();
+        if (message != null) {
+            messagingTemplate.convertAndSend("/topic/session/" + s, message);
+        }
     }
 
     private String normalizeQuery(String q) { 
         if (q == null) return "";
         // Clean whitespace but keep semantic symbols for vector search
-        return q.trim().toLowerCase().replaceAll("\\s+", " ").replaceAll("[^a-z0-9\\+\\-\\*\\/\\s\\?]", "");
+        return q.trim().toLowerCase().replaceAll("\\s+", " ").replaceAll("[^a-z0-9\\+\\-\\*\\/\\!\\?\\s\\_]", "");
     }
 }

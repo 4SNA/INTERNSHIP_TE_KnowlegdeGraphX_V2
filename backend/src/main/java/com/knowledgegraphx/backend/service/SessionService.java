@@ -36,7 +36,8 @@ public class SessionService {
                 .createdBy(creator)
                 .build();
         
-        Session savedSession = java.util.Objects.requireNonNull(sessionRepository.save(session), "Neural Inception: Session creation failed.");
+        Session savedSession = sessionRepository.save(session);
+        if (savedSession == null) throw new IllegalStateException("Neural Inception: Session creation failed.");
 
         // Creator automatically joins as ADMIN
         SessionUser sessionUser = SessionUser.builder()
@@ -45,7 +46,9 @@ public class SessionService {
                 .role(SessionUser.UserRole.ADMIN)
                 .build();
         
-        java.util.Objects.requireNonNull(sessionUserRepository.save(sessionUser), "Neural Inception: Creator auto-join failed.");
+        if (sessionUserRepository.save(sessionUser) == null) {
+            throw new IllegalStateException("Neural Inception: Creator auto-join failed.");
+        }
         
         return savedSession;
     }
@@ -68,7 +71,9 @@ public class SessionService {
                 .role(SessionUser.UserRole.COLLABORATOR)
                 .build();
 
-        java.util.Objects.requireNonNull(sessionUserRepository.save(sessionUser), "Neural Inception: Join attempt failed.");
+        if (sessionUserRepository.save(sessionUser) == null) {
+            throw new IllegalStateException("Neural Inception: Join attempt failed.");
+        }
         
         return session;
     }
@@ -145,7 +150,9 @@ public class SessionService {
                         .user(creator)
                         .role(SessionUser.UserRole.ADMIN)
                         .build();
-                sessionUserRepository.save(su);
+                if (sessionUserRepository.save(su) == null) {
+                    throw new IllegalStateException("Neural Ownership: Audit failed to persist ADMIN role.");
+                }
             }
         }
     }
@@ -153,7 +160,7 @@ public class SessionService {
     @org.springframework.cache.annotation.Cacheable(value = "sessionMetadata", key = "#sessionId", unless = "#result == null")
     public com.knowledgegraphx.backend.dto.SessionCacheDTO getSessionMetadata(Long sessionId) {
         try {
-            return sessionRepository.findById(sessionId)
+            return sessionRepository.findById(java.util.Objects.requireNonNull(sessionId))
                     .map(s -> com.knowledgegraphx.backend.dto.SessionCacheDTO.builder()
                             .sessionId(s.getId())
                             .sessionCode(s.getSessionCode())

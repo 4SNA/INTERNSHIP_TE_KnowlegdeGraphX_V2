@@ -511,18 +511,18 @@ export function ChatUI() {
           </div>
 
           <div className="flex items-center justify-center gap-3 mt-3">
-            <p className="text-[9px] text-zinc-700 font-extrabold uppercase tracking-widest flex items-center gap-1">
+            <span className="text-[9px] text-zinc-700 font-extrabold uppercase tracking-widest flex items-center gap-1">
               <BarChart2Icon size={9} /> Precision RAG Core v3.0
-            </p>
+            </span>
             <div className="w-1 h-1 rounded-full bg-zinc-800" />
-            <p className="text-[9px] text-zinc-700 font-extrabold uppercase tracking-widest">End-to-End Encrypted</p>
+            <span className="text-[9px] text-zinc-700 font-extrabold uppercase tracking-widest">End-to-End Encrypted</span>
             {activeSession && (
               <>
                 <div className="w-1 h-1 rounded-full bg-zinc-800" />
-                <p className="text-[9px] text-zinc-700 font-extrabold uppercase tracking-widest flex items-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                <span className="text-[9px] text-zinc-700 font-extrabold uppercase tracking-widest flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse inline-block" />
                   Session #{activeSession.sessionCode}
-                </p>
+                </span>
               </>
             )}
           </div>

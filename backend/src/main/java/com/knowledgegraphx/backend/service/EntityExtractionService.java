@@ -6,6 +6,7 @@ import com.knowledgegraphx.backend.model.Document;
 import com.knowledgegraphx.backend.model.KnowledgeEntity;
 import com.knowledgegraphx.backend.model.KnowledgeRelationship;
 import com.knowledgegraphx.backend.repository.KnowledgeEntityRepository;
+import com.knowledgegraphx.backend.repository.KnowledgeRelationshipRepository;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +26,15 @@ public class EntityExtractionService {
 
     private final ChatLanguageModel chatLanguageModel;
     private final KnowledgeEntityRepository knowledgeEntityRepository;
-    private final com.knowledgegraphx.backend.repository.KnowledgeRelationshipRepository knowledgeRelationshipRepository;
+    private final KnowledgeRelationshipRepository knowledgeRelationshipRepository;
     private final ObjectMapper objectMapper;
+
+    @Transactional
+    public void clearSessionGraph(Long sessionId) {
+        log.info("Neural Purge: Irreversibly clearing knowledge graph for session {}", sessionId);
+        knowledgeRelationshipRepository.deleteBySessionId(sessionId);
+        knowledgeEntityRepository.deleteBySessionId(sessionId);
+    }
 
     @Transactional
     public void extractAndSaveEntities(Document document, String text) {
@@ -36,108 +45,102 @@ public class EntityExtractionService {
             return;
         }
 
-        // 1. Clear existing entities (Cascade handles relationships)
         try {
-            knowledgeEntityRepository.deleteByDocumentId(document.getId());
-        } catch (Exception e) {
-            log.warn("Neural Extraction: Failed to clear previous graph nodes for doc {}", document.getFileName());
-        }
-
-        try {
-            // Neural Multi-Segment Intelligence: Sampling 10k from Start, 10k from Mid, 10k from End
+            // Optimized Sampling: High-density clusters from start and mid
             int totalLen = text.length();
-            String start = text.substring(0, Math.min(totalLen, 10000));
-            String mid = totalLen > 20000 ? text.substring(totalLen/2 - 5000, totalLen/2 + 5000) : "";
-            String end = totalLen > 30000 ? text.substring(totalLen - 10000) : "";
-            
-            String contentSample = start + "\n[... Segment Break ...]\n" + mid + "\n[... Segment Break ...]\n" + end;
+            String start = text.substring(0, Math.min(totalLen, 6000));
+            String mid = totalLen > 15000 ? text.substring(totalLen/2 - 2000, totalLen/2 + 2000) : "";
+            String contentSample = start + "\n[... Segment Gap ...]\n" + mid;
 
             String prompt = String.format("""
-                    You are the KnowledgeGraphX Neural Analyst (Expert-Level). 
-                    Your mission is 100%% semantic discovery for document: '%s'.
-                    
-                    TASK PERIMETER:
-                    1. IDENTIFY ALL ENTITIES: People, Organizations, Skills, Technical Metrics, Key Topics, and Locations.
-                    2. STUDY INTERNAL RELATIONSHIPS: How do these entities interact within this specific document?
-                    3. MULTI-DOCUMENT CONTEXT: Focus on identifying shared hubs that could link to other research materials.
-                    
-                    SCHEMA NODES:
-                    - PERSON, ORGANIZATION, SKILL, EXPERIENCE, METRIC, IDENTIFIER, TOPIC, DATE, LOCATION.
-                    
-                    OUTPUT PROTOCOL (MANDATORY JSON):
-                    {
-                      "entities": [{ "name": "...", "type": "...", "context": "Detailed evidence sentence" }],
-                      "relationships": [{ "source": "...", "target": "...", "relation": "..." }]
-                    }
-                    
-                    Goal: Be exhaustive. If it appears in the text, it must be in the graph. 
-                    If this is a RESUME, extract all SKILLS and previous ORGANIZATIONS.
-                    
-                    Source Text Segments:
+                    [FAST-EXTRACT] File: %s
+                    Extract JSON graph.
+                    RULES:
+                    - ENTITIES: PEOPLE, ORGANIZATIONS, TECHNICAL, CONCEPTS.
+                    - RELATIONS: Source -> Target (e.g. WORKS_AT, USES).
+                    FORMAT: {"entities": [{"name": "..", "type": "..", "context": ".."}], "relationships": [{"source": "..", "target": "..", "relation": ".."}]}
+                    CONTENT:
                     %s
                     """, document.getFileName(), contentSample);
 
             String response = chatLanguageModel.generate(prompt);
-            String json = response.replaceAll("(?s)```json(.*?)```", "$1")
-                                 .replaceAll("(?s)```(.*?)```", "$1")
-                                 .trim();
+            log.debug("Neural Extraction: Engine response received.");
+            
+            String json = response.trim();
+            // Robust JSON capture
+            int firstBrace = json.indexOf("{");
+            int lastBrace = json.lastIndexOf("}");
+            if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+                json = json.substring(firstBrace, lastBrace + 1);
+            }
             
             ExtractedEntityDTO dto = objectMapper.readValue(json, ExtractedEntityDTO.class);
             
-            // Step A: Save Entities and Map Names (with Global Session Resolution)
-            Map<String, KnowledgeEntity> savedEntities = new HashMap<>();
-            if (dto.getEntities() != null) {
-                for (ExtractedEntityDTO.EntityWrapper wrapper : dto.getEntities()) {
-                    String eName = wrapper.getName();
-                    String eType = wrapper.getType().toUpperCase();
-                    
-                    // Resolution: Check if this entity already exists in this session (Global Cross-Doc Linking)
-                    KnowledgeEntity saved = knowledgeEntityRepository
-                            .findBySessionIdAndNameIgnoreCase(document.getSession().getId(), eName)
-                            .orElseGet(() -> {
-                                KnowledgeEntity entity = KnowledgeEntity.builder()
-                                        .name(eName)
-                                        .type(eType)
-                                        .context(wrapper.getContext())
-                                        .session(java.util.Objects.requireNonNull(document.getSession(), "Neural Ingestion: Document must belong to a session."))
-                                        .build();
-                                entity.getDocuments().add(document);
-                                return java.util.Objects.requireNonNull(knowledgeEntityRepository.save(entity), "Neural Ingestion: Entity persistence failed.");
-                            });
-                    
-                    // Bridge Detection: Link this document to a shared conceptual hub (Global Cross-Doc Linking)
-                    saved.getDocuments().add(document);
-                    knowledgeEntityRepository.save(saved);
-                    
-                    if (saved.getDocuments().size() > 1) {
-                        log.info("Neural Bridge: Global entity '{}' now synaptically links {} documents.", 
-                                eName, saved.getDocuments().size());
-                    }
-                            
-                    savedEntities.put(eName.toLowerCase(), saved);
-                }
+            if (dto == null || dto.getEntities() == null) {
+                log.warn("Neural Extraction: No entities discovered in document {}.", document.getFileName());
+                return;
             }
 
-            // Step B: Resolve and Save Relationships
+            // Step A: Strategic Entity Resolution
+            Map<String, KnowledgeEntity> sessionEntities = new HashMap<>();
+            
+            for (ExtractedEntityDTO.EntityWrapper wrapper : dto.getEntities()) {
+                String eName = wrapper.getName();
+                if (eName == null || eName.isBlank()) continue;
+                
+                String eType = wrapper.getType() != null ? wrapper.getType().toUpperCase() : "CONCEPT";
+                
+                // Concurrent-safe resolution
+                KnowledgeEntity entity = knowledgeEntityRepository
+                        .findBySessionIdAndNameIgnoreCase(document.getSession().getId(), eName)
+                        .orElseGet(() -> {
+                            KnowledgeEntity newEntity = KnowledgeEntity.builder()
+                                    .name(eName)
+                                    .type(eType)
+                                    .context(wrapper.getContext())
+                                    .session(document.getSession())
+                                    .documents(new java.util.HashSet<>())
+                                    .build();
+                            KnowledgeEntity saved = knowledgeEntityRepository.save(newEntity);
+                            if (saved == null) throw new IllegalStateException("Neural Extraction: Failed to persist new entity.");
+                            return saved;
+                        });
+                
+                // Link document to entity
+                entity.getDocuments().add(document);
+                knowledgeEntityRepository.save(entity);
+                sessionEntities.put(eName.toLowerCase(), entity);
+            }
+
+            // Step B: Relationship Mapping
             if (dto.getRelationships() != null) {
-                List<KnowledgeRelationship> relsToSave = new ArrayList<>();
-                for (ExtractedEntityDTO.RelationshipWrapper wrapper : dto.getRelationships()) {
-                    KnowledgeEntity source = savedEntities.get(wrapper.getSource().toLowerCase());
-                    KnowledgeEntity target = savedEntities.get(wrapper.getTarget().toLowerCase());
+                List<KnowledgeRelationship> relationships = new ArrayList<>();
+                for (ExtractedEntityDTO.RelationshipWrapper relWrapper : dto.getRelationships()) {
+                    KnowledgeEntity source = sessionEntities.get(relWrapper.getSource().toLowerCase());
+                    KnowledgeEntity target = sessionEntities.get(relWrapper.getTarget().toLowerCase());
                     
                     if (source != null && target != null) {
-                        relsToSave.add(KnowledgeRelationship.builder()
-                                .source(source)
-                                .target(target)
-                                .relationType(wrapper.getRelation())
-                                .session(document.getSession())
-                                .build());
+                        // Check if relationship already exists to avoid duplicates
+                        boolean exists = knowledgeRelationshipRepository.existsBySourceIdAndTargetIdAndRelationType(
+                            source.getId(), target.getId(), relWrapper.getRelation());
+                            
+                        if (!exists) {
+                            relationships.add(KnowledgeRelationship.builder()
+                                    .source(source)
+                                    .target(target)
+                                    .relationType(relWrapper.getRelation())
+                                    .session(document.getSession())
+                                    .build());
+                        }
                     }
                 }
-                knowledgeRelationshipRepository.saveAll(relsToSave);
-                log.info("Neural Extraction: Synced {} nodes and {} relationships for doc {}", 
-                    savedEntities.size(), relsToSave.size(), document.getFileName());
+                if (!relationships.isEmpty()) {
+                    knowledgeRelationshipRepository.saveAll(relationships);
+                }
             }
+            
+            log.info("Neural Extraction: Success. Doc '{}' -> {} entities, {} relationships.", 
+                    document.getFileName(), sessionEntities.size(), dto.getRelationships() != null ? dto.getRelationships().size() : 0);
 
         } catch (Exception e) {
             log.error("Neural Extraction Failure for document {}: {}", document.getFileName(), e.getMessage());
