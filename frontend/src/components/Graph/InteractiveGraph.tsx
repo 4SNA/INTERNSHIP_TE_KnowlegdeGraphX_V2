@@ -9,6 +9,7 @@ import { Button } from "../Button";
 import { Card } from "../Card";
 import axiosInstance from "@/api";
 import { useSession } from "@/context/SessionContext";
+import { useWebSocket } from "@/context/WebSocketContext";
 
 interface NeuralNode {
   id: string;
@@ -34,6 +35,7 @@ interface KnowledgeNetwork {
 
 export function InteractiveGraph() {
   const { activeSession } = useSession();
+  const { graphRefreshSignal } = useWebSocket();
   const [network, setNetwork] = React.useState<KnowledgeNetwork>({ nodes: [], edges: [] });
   const [activeNodeId, setActiveNodeId] = React.useState<string | null>(null);
   const [selectedNode, setSelectedNode] = React.useState<NeuralNode | null>(null);
@@ -43,7 +45,7 @@ export function InteractiveGraph() {
   const [viewOffset, setViewOffset] = React.useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = React.useState(false);
   const [panStart, setPanStart] = React.useState({ x: 0, y: 0 });
-  const [analysisResults, setAnalysisResults] = React.useState<string[]>([]);
+  const [neuralAuditInsights, setNeuralAuditInsights] = React.useState<string[]>([]);
   const [analyzing, setAnalyzing] = React.useState(false);
   const [offset, setOffset] = React.useState({ x: 0, y: 0 });
 
@@ -112,6 +114,11 @@ export function InteractiveGraph() {
     fetchGraph();
   }, [fetchGraph]);
 
+  // Auto-refresh graph when entity extraction completes for any uploaded file
+  React.useEffect(() => {
+    if (graphRefreshSignal > 0) fetchGraph();
+  }, [graphRefreshSignal, fetchGraph]);
+
   const runNeuralAudit = async () => {
     if (!activeSession || !selectedNode) return;
     setAnalyzing(true);
@@ -124,7 +131,7 @@ export function InteractiveGraph() {
       }
 
       const res = await axiosInstance.get(`/api/sessions/${activeSession.sessionId}/analyze-path`);
-      setAnalysisResults(res.data.insights || []);
+      setNeuralAuditInsights(res.data.insights || ["No anomalies detected in the current neural cluster."]);
     } catch (err) {
       console.error("Neural Audit failed", err);
     } finally {
@@ -427,13 +434,13 @@ export function InteractiveGraph() {
               </div>
            </div>
 
-           {analysisResults.length > 0 && (
+           {neuralAuditInsights.length > 0 && (
                <div className="p-5 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-4">
                   <h5 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
                      <Sparkles size={12} /> Relationship Audit Insights
                   </h5>
                   <div className="space-y-2">
-                     {analysisResults.map((insight, i) => (
+                     {neuralAuditInsights.map((insight, i) => (
                         <p key={i} className="text-[10px] text-zinc-400 font-medium leading-relaxed border-l-2 border-indigo-500/30 pl-3">
                            {insight}
                         </p>

@@ -150,10 +150,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       const isAIQuery = type === 'AI_QUERY';
       const isAIResponse = type === 'AI_RESPONSE';
       const isOwnMessage = payload.senderEmail?.toLowerCase() === user?.email?.toLowerCase();
-
-      // Clinical Deduplication & Ghosting Prevention
-      // If it's a query sync from the user themselves, don't create an assistant bubble for it.
-      if (isAIQuery && isOwnMessage) return prev;
+      // Only skip duplicate USER messages from self
+      if (!isAI && isOwnMessage) return prev;
 
       const isDuplicate = prev.some(m => m.id === mId);
       

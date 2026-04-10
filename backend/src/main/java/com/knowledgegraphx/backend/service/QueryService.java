@@ -113,27 +113,17 @@ public class QueryService {
             String docManifest = workspaceDocs.stream().map(com.knowledgegraphx.backend.model.Document::getFileName).collect(Collectors.joining("\n"));
             String graphContext = getGraphIntelligenceContext(normalizedQuery, sessionId, unique);
             
-            // Start streaming immediately
-            broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.STREAM_CHUNK, messageId, null, userEmail);
+            // Step 3: Neural Synthesis
+            broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", "Neural Sync: Synthesizing Response...", com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_QUERY, messageId, null, userEmail);
             
-            // USE rewrittenQuery instead of normalizedQuery for synthesis to avoid losing punctuation/casing
-            answer = getSynthesizedAnswerFast(rewrittenQuery, history, unique, sessionId, graphContext, docManifest, messageId, userEmail);
-            if (answer != null) answer = pruneRedundantContent(answer);
-            
-            try { 
-                if (answer != null) {
-                    redisTemplate.opsForValue().set(cacheKey, answer, Objects.requireNonNull(Duration.ofHours(24))); 
-                }
-            } catch (Exception ignore) {}
+            // Non-blocking streaming synthesis
+            getSynthesizedAnswerAsync(rewrittenQuery, history, unique, sessionId, graphContext, docManifest, messageId, userEmail);
         } else {
             broadcastStreamingChunk(sessionId, answer, messageId, userEmail);
+            List<String> suggestions = generateNeuralSuggestions(question, answer);
+            archiveQuery(question, answer, userEmail, sessionId, suggestions);
+            broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", answer, com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE, messageId, suggestions, userEmail);
         }
-
-        List<String> suggestions = generateNeuralSuggestions(question, answer);
-        archiveQuery(question, answer, userEmail, sessionId, suggestions);
-        
-        // Final broadcast to sync sources and suggestions
-        broadcastMessageWithId(sessionId, "KnowledgeGraphX Intelligence", answer, com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE, messageId, suggestions, userEmail);
     }
 
     @SuppressWarnings("unused")
@@ -159,45 +149,42 @@ public class QueryService {
         return mistralChatModel.generate(prompt);
     }
 
-    private String getSynthesizedAnswerFast(String q, List<QueryHistory> hist, List<TextSegment> segs, Long sid, String graph, String manifest, String mid, String userEmail) {
-        String context = Objects.requireNonNull(segs).stream().map(TextSegment::text).collect(Collectors.joining("\n\n"));
-        buildHistoryBuffer(hist); // history buffer for future context injection
-        
-        String system = "You are the KnowledgeGraphX Strategic Hub. You are an elite research analyst capable of 100% document retrieval and understanding.\n\n" +
-                       "OPERATIONAL DIRECTIVES:\n" +
-                       "1. EVIDENCE-FIRST REASONING: Your answers MUST be justifiable based on the provided RESEARCH_CONTEXT and NEURAL_GRAPH.\n" +
-                       "2. MULTI-DOC SYNTHESIS: Actively look for patterns, contradictions, or confirmations across multiple documents in the manifest.\n" +
-                       "3. SOURCE CITATIONS: When using specific data, cite the document name in brackets like [DocName.pdf].\n" +
-                       "4. ZERO FLUFF: Do not use introductory phrases. Start with the most important data.\n" +
-                       "5. TECHNICAL AUTHORITY: Use bolding for key entities and formatted lists for structured insights. Be clinical and precise.";
-        
-        String user = String.format("""
-            ### KNOWLEDGE_MANIFEST (Active Workspace):
+    // Neural Synthesis Core
+    private void getSynthesizedAnswerAsync(String question, List<QueryHistory> history, List<TextSegment> unique, Long sid, String graph, String docs, String mid, String userEmail) {
+        String system = String.format("""
+            SYSTEM MODE: RESEARCH ANALYST.
+            CONTEXT:
+            # Workspace Manifest:
             %s
-            
-            ### NEURAL_GRAPH (Known Entities):
+            # Neural Graph Fragments:
             %s
-            
-            ### RESEARCH_CONTEXT (Verified Data Fragments):
+            # Semantic Data Fragments:
             %s
-            
-            ### USER_QUERY:
-            %s
-            
-            Research Directive: Synthesize all available evidence. Be clinical, justifiable, and exhaustive.
-            """, manifest, graph, context, q);
-        
-        CompletableFuture<String> response = new CompletableFuture<>();
+            RULES:
+            - Concise, evidence-based answers. Use Markdown.
+            - Focus on identifying specific files/entities if asked.
+            """, docs, graph, unique.stream().map(s -> "["+s.metadata().getString("fileName")+"] " + s.text()).collect(Collectors.joining("\n")));
+
+        String user = "History Context:\n" + buildHistoryBuffer(history) + "\n\nQuery: " + question;
         StringBuilder full = new StringBuilder();
+        
         StreamingResponseHandler<AiMessage> handler = new StreamingResponseHandler<AiMessage>() {
             @Override public void onNext(String token) { full.append(token); broadcastStreamingChunk(sid, token, mid, userEmail); }
-            @Override public void onComplete(Response<AiMessage> res) { response.complete(full.toString()); }
-            @Override public void onError(Throwable err) { response.completeExceptionally(err); }
+            @Override public void onComplete(Response<AiMessage> res) { 
+                String finalAns = pruneRedundantContent(full.toString());
+                String cacheKey = "ai:query:" + sid + ":" + normalizeQuery(question);
+                try { redisTemplate.opsForValue().set(cacheKey, finalAns, Duration.ofHours(24)); } catch (Exception ignore) {}
+                
+                List<String> suggestions = generateNeuralSuggestions(question, finalAns);
+                archiveQuery(question, finalAns, userEmail, sid, suggestions);
+                broadcastMessageWithId(sid, "KnowledgeGraphX Intelligence", finalAns, com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE, mid, suggestions, userEmail);
+            }
+            @Override public void onError(Throwable err) { 
+                log.error("Neural Exhaustion in stream", err);
+                broadcastMessageWithId(sid, "KnowledgeGraphX AI", "Synthesis Interrupted: " + err.getMessage(), com.knowledgegraphx.backend.dto.ChatMessage.MessageType.AI_RESPONSE, mid, null, userEmail);
+            }
         };
-        try {
-            llama3StreamingModel.generate(List.of(SystemMessage.from(system), UserMessage.from(user)), handler);
-            return response.get(300, TimeUnit.SECONDS);
-        } catch (Exception e) { return "CRITICAL ERROR: Neural Synthesis interrupted. The response was too large or computation timed out."; }
+        llama3StreamingModel.generate(List.of(SystemMessage.from(system), UserMessage.from(user)), handler);
     }
 
     private String buildHistoryBuffer(List<QueryHistory> history) {

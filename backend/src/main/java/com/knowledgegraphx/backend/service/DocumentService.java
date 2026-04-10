@@ -39,6 +39,7 @@ public class DocumentService {
     private final VectorSearchService vectorSearchService;
     private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
     private final EntityExtractionService entityExtractionService;
+    private final org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
     private final Tika tika = new Tika();
 
     private void evictSessionAiCache(Long sessionId) {
@@ -129,12 +130,22 @@ public class DocumentService {
                     try {
                         entityExtractionService.extractAndSaveEntities(savedDoc, extractedText);
                         log.info("Neural Sync: Entity mapping successful for doc {}", savedDoc.getFileName());
+                        // Notify all session clients that the graph has been updated
+                        try {
+                            java.util.Map<String, Object> graphUpdate = new java.util.HashMap<>();
+                            graphUpdate.put("type", "GRAPH_UPDATED");
+                            graphUpdate.put("sessionId", sessionId);
+                            graphUpdate.put("fileName", savedDoc.getFileName());
+                            messagingTemplate.convertAndSend("/topic/session/" + sessionId, graphUpdate);
+                        } catch (Exception msgErr) {
+                            log.warn("Neural Sync: Could not broadcast graph update event: {}", msgErr.getMessage());
+                        }
                     } catch (Exception e) {
                         log.error(
                                 "Neural Sync: Intelligence mapping failed for doc {}: {}. Knowledge Graph and branching nodes will be empty.",
                                 savedDoc.getFileName(), e.getMessage());
                     }
-                    Thread.sleep(2000); // Guard interval for local LLM recovery
+                    Thread.sleep(300); // Reduced guard interval - was 2000ms
                 }
 
                 evictSessionAiCache(sessionId);

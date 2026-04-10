@@ -16,6 +16,7 @@ interface ActiveUser {
 interface WebSocketContextType {
   connected: boolean;
   activeUsers: ActiveUser[];
+  graphRefreshSignal: number;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -23,6 +24,7 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(undefin
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [connected, setConnected] = useState(false);
   const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
+  const [graphRefreshSignal, setGraphRefreshSignal] = useState(0);
   const stompClient = useRef<Client | null>(null);
   const { user } = useAuth();
   const { activeSession } = useSession();
@@ -101,7 +103,12 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     const { type, sender, avatarUrl, senderEmail } = payload;
     
-    if (type === 'JOIN' || type === 'USER_JOINED') {
+    if (type === 'GRAPH_UPDATED') {
+      // Graph extraction complete — trigger a re-fetch in graph components
+      console.log('Graph updated for file:', payload.fileName);
+      setGraphRefreshSignal(prev => prev + 1);
+      return;
+    } else if (type === 'JOIN' || type === 'USER_JOINED') {
       setActiveUsers(prev => {
         if (!prev.find(u => u.email === senderEmail || u.name === sender)) {
           return [...prev, { name: sender, avatarUrl, email: senderEmail }];
@@ -123,7 +130,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   }, [activeSession, user, connect, disconnect]);
 
   return (
-    <WebSocketContext.Provider value={{ connected, activeUsers }}>
+    <WebSocketContext.Provider value={{ connected, activeUsers, graphRefreshSignal }}>
       {children}
     </WebSocketContext.Provider>
   );
