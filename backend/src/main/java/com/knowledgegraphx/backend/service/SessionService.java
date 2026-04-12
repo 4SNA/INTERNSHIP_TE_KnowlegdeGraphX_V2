@@ -37,7 +37,7 @@ public class SessionService {
                 .build();
         
         Session savedSession = sessionRepository.save(session);
-        if (savedSession == null) throw new IllegalStateException("Neural Inception: Session creation failed.");
+        if (savedSession.getId() == null) throw new IllegalStateException("Neural Inception: Session creation failed.");
 
         // Creator automatically joins as ADMIN
         SessionUser sessionUser = SessionUser.builder()
@@ -46,7 +46,8 @@ public class SessionService {
                 .role(SessionUser.UserRole.ADMIN)
                 .build();
         
-        if (sessionUserRepository.save(sessionUser) == null) {
+        SessionUser savedSU = sessionUserRepository.save(sessionUser);
+        if (savedSU.getId() == null) {
             throw new IllegalStateException("Neural Inception: Creator auto-join failed.");
         }
         
@@ -71,7 +72,8 @@ public class SessionService {
                 .role(SessionUser.UserRole.COLLABORATOR)
                 .build();
 
-        if (sessionUserRepository.save(sessionUser) == null) {
+        SessionUser savedJoin = sessionUserRepository.save(sessionUser);
+        if (savedJoin.getId() == null) {
             throw new IllegalStateException("Neural Inception: Join attempt failed.");
         }
         
@@ -150,7 +152,8 @@ public class SessionService {
                         .user(creator)
                         .role(SessionUser.UserRole.ADMIN)
                         .build();
-                if (sessionUserRepository.save(su) == null) {
+                SessionUser savedAudit = sessionUserRepository.save(su);
+                if (savedAudit.getId() == null) {
                     throw new IllegalStateException("Neural Ownership: Audit failed to persist ADMIN role.");
                 }
             }
