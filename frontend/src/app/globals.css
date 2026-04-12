@@ -65,7 +65,7 @@
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-emerald-400 to-peacock-light;
+    @apply bg-clip-text text-transparent bg-linear-to-r from-indigo-400 via-emerald-400 to-peacock-light;
   }
 
   /* CUSTOM SCROLLBAR REFINEMENT */

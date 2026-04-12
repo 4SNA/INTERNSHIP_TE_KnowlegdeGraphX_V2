@@ -39,7 +39,7 @@ function SidebarItem({ icon: Icon, label, href, active, collapsed }: SidebarItem
       )}
       title={collapsed ? label : undefined}
     >
-      <div className={cn("transition-colors flex-shrink-0", collapsed ? "mx-auto" : "mr-3", active ? "text-indigo-400" : "group-hover:text-white")}>
+      <div className={cn("transition-colors shrink-0", collapsed ? "mx-auto" : "mr-3", active ? "text-indigo-400" : "group-hover:text-white")}>
         <Icon size={20} />
       </div>
       {!collapsed && (
@@ -173,7 +173,7 @@ export function Sidebar() {
           className="w-full h-11 px-3 rounded-xl flex items-center text-zinc-600 hover:text-white hover:bg-zinc-900 transition-all border border-transparent group"
           aria-expanded={!isCollapsed}
         >
-          <div className={cn("flex-shrink-0 transition-colors", isCollapsed ? "mx-auto rotate-180" : "mr-3", "group-hover:text-white")}>
+          <div className={cn("shrink-0 transition-colors", isCollapsed ? "mx-auto rotate-180" : "mr-3", "group-hover:text-white")}>
             <ChevronLeft size={20} />
           </div>
           {!isCollapsed && <span className="text-sm font-medium">Minimize Workspace</span>}
