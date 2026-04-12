@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Intelligence Report | KnowledgeGraphX</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --surface: #121216;
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #22d3ee;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+            --fail: #ef4444;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        header {
+            text-align: left;
+            margin-bottom: 50px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .timestamp {
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: var(--primary);
+            padding: 2px 10px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-item {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            border-left: 3px solid var(--accent);
+        }
+
+        .sample-row {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .question {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .answer {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+        }
+
+        pre {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>RAG Intelligence Report</h1>
+                <div class="timestamp">Reference: KnowledgeGraphX_Audit_2026-04-11_12:13:11</div>
+            </div>
+            <div class="timestamp">V1.0.4 - Production Baseline</div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">37</div>
+                <div class="stat-label">Total Transactions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--success)">86.49%</div>
+                <div class="stat-label">Answer Grounding</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--accent)">34.38%</div>
+                <div class="stat-label">Evidence Citation Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">32</div>
+                <div class="stat-label">Valid Context Fetches</div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-container">
+                <h2>Retrieval Performance</h2>
+                <canvas id="mainChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Intelligence Blueprint</h2>
+                <ul class="feature-list">
+                    <li class="feature-item"><b>Hybrid Hub Search:</b> Dual-stage scan (60% Semantic / 40% Keyword).</li>
+                    <li class="feature-item"><b>Quality Gate:</b> Optimized local quality threshold at 0.50 score.</li>
+                    <li class="feature-item"><b>Triple-Segment Extraction:</b> Semantic Splitting (1.5k chunks, 0.72 overlap).</li>
+                    <li class="feature-item"><b>Neural Reranking:</b> Cross-encoder logic for result prioritization.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="chart-container" style="margin-bottom: 40px;">
+            <h2>Recent Intelligence Activity</h2>
+            <div id="samples">
+                <div class="sample-row"><div class="question">Q: give one line summary for pdf</div><div class="answer">A: **Workspace Files:** KnowledgeGraphX Full Presentation (5).pdf</div></div><div class="sample-row"><div class="question">Q: give me summary for pdf</div><div class="answer">A: Title: KnowledgeGraphX Full Presentation (5)</div></div><div class="sample-row"><div class="question">Q: Write a Python data analysis script</div><div class="answer">A: To write a Python data analysis script, you can use libraries such as pandas for data manipulation and matplotlib or seaborn for data visualization. Here's an example of a simple data analysis script using the iris dataset, which is included with the scikit-learn library:</div></div><div class="sample-row"><div class="question">Q: now what files do we have</div><div class="answer">A: There are two files currently present in the workspace:</div></div><div class="sample-row"><div class="question">Q: whats in our chat</div><div class="answer">A: In the current context of our chat, there are no specific files or entities mentioned. However, I can see that you've provided a Workspace Manifest with the file name "AMCAT_PAYMENT.pdf". This suggests that there might be a document related to AMCAT payments in your workspace.</div></div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Technical Stack Audit</h2>
+            <pre>
+- Backend: Java Spring Boot 3.x
+- LLM Pipeline: LangChain4j (Llama3-8B / Mistral-7B)
+- Vector Store: PostgreSQL + PGVector
+- Embedding: Mixedbread-AI / Sentence-Transformers
+- Retrieval Method: Semantic Search + Keyword Overlays
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Queries', 'Successful Retrieval', 'Cited Responses', 'Negative Matches'],
+                datasets: [{
+                    label: 'Transaction Count',
+                    data: [37, 32, 11, 5],
+                    backgroundColor: [
+                        'rgba(99, 102, 241, 0.6)',
+                        'rgba(16, 185, 129, 0.6)',
+                        'rgba(34, 211, 238, 0.6)',
+                        'rgba(239, 68, 68, 0.6)'
+                    ],
+                    borderColor: [
+                        '#6366f1',
+                        '#10b981',
+                        '#22d3ee',
+                        '#ef4444'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+    
