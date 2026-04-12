@@ -1,6 +1,10 @@
 package com.knowledgegraphx.backend.controller;
 
 import com.knowledgegraphx.backend.service.QueryService;
+import com.knowledgegraphx.backend.model.QueryHistory;
+import com.knowledgegraphx.backend.repository.QueryHistoryRepository;
+import com.knowledgegraphx.backend.dto.QueryResponse;
+import com.knowledgegraphx.backend.dto.QueryHistoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -8,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/query")
@@ -15,7 +24,7 @@ import java.util.Objects;
 public class QueryController {
 
     private final QueryService queryService;
-    private final com.knowledgegraphx.backend.repository.QueryHistoryRepository queryHistoryRepository;
+    private final QueryHistoryRepository queryHistoryRepository;
 
     @PostMapping("/ask")
     public ResponseEntity<?> askQuestion(
@@ -30,7 +39,7 @@ public class QueryController {
             return ResponseEntity.badRequest().body("Invalid sessionId");
         }
 
-        com.knowledgegraphx.backend.dto.QueryResponse responseBody = queryService.performQuery(
+        QueryResponse responseBody = queryService.performQuery(
                 Objects.requireNonNull(question),
                 Objects.requireNonNull(sessionId),
                 Objects.requireNonNull(email));
@@ -41,25 +50,26 @@ public class QueryController {
     @GetMapping("/history/{sessionId}")
     public ResponseEntity<?> getHistory(@PathVariable Long sessionId) {
         try {
-            java.util.List<com.knowledgegraphx.backend.model.QueryHistory> items = queryHistoryRepository.findBySessionIdOrderByTimestampDesc(sessionId);
-            if (items == null) return ResponseEntity.ok(new java.util.ArrayList<>());
+            List<QueryHistory> items = queryHistoryRepository.findBySessionIdOrderByTimestampDesc(sessionId);
+            if (items == null) return ResponseEntity.ok(new ArrayList<>());
             
-            java.util.List<com.knowledgegraphx.backend.dto.QueryHistoryResponse> responses = items.stream().map(h -> 
-                com.knowledgegraphx.backend.dto.QueryHistoryResponse.builder()
+            List<QueryHistoryResponse> responses = items.stream().map(h -> 
+                QueryHistoryResponse.builder()
                     .id(h.getId())
                     .question(h.getQuestion())
                     .response(h.getResponse())
                     .timestamp(h.getTimestamp().toString())
-                    .senderEmail(h.getUser().getEmail())
+                    .senderEmail(h.getUser() != null ? h.getUser().getEmail() : "system")
                     .suggestedQueries(h.getSuggestedQueries() != null ? 
-                        java.util.Arrays.asList(h.getSuggestedQueries().split(";")) : 
-                        java.util.Collections.emptyList())
+                        Arrays.asList(h.getSuggestedQueries().split(";")) : 
+                        Collections.emptyList())
                     .build()
-            ).collect(java.util.stream.Collectors.toList());
+            ).collect(Collectors.toList());
             
             return ResponseEntity.ok(responses);
         } catch (Exception e) {
-            return ResponseEntity.ok(new java.util.ArrayList<>());
+            return ResponseEntity.ok(new ArrayList<>());
         }
     }
 }
+

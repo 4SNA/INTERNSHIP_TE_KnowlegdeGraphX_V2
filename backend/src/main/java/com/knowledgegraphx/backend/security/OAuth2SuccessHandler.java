@@ -16,7 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -81,9 +80,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .providerId(finalProviderId)
                     .build();
             User saved = userRepository.save(newUser);
-            if (saved == null) throw new IllegalStateException("Neural Auth: Failed to persist OAuth2 user.");
+            if (saved.getId() == null) throw new IllegalStateException("Neural Auth: Failed to persist OAuth2 user.");
             return saved;
         });
+
 
         // Update last login and avatar if changed
         user.setLastLogin(LocalDateTime.now());

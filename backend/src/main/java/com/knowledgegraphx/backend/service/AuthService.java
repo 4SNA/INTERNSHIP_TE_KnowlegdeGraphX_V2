@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +37,7 @@ public class AuthService {
                 .build();
 
         User saved = userRepository.save(user);
-        if (saved == null) throw new IllegalStateException("Neural Auth: Failed to persist new user.");
+        if (saved.getId() == null) throw new IllegalStateException("Neural Auth: Failed to persist new user.");
         return saved;
     }
 
@@ -77,7 +76,8 @@ public class AuthService {
         }
 
         User saved = userRepository.save(user);
-        if (saved == null) throw new IllegalStateException("Neural Auth: Failed to update user profile.");
+        if (saved.getId() == null) throw new IllegalStateException("Neural Auth: Failed to update user profile.");
         return saved;
     }
 }
+
