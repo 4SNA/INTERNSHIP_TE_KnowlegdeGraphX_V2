@@ -129,14 +129,24 @@ public class SemanticSplitter {
     }
 
     private List<String> splitIntoSentences(String text) {
-        String[] parts = text.split("(?<=[.!?])\\s+(?=[A-Z])");
+        if (text == null || text.isBlank()) return new ArrayList<>();
+        
+        // Optimized regex: Splitting by punctuation followed by ANY whitespace or line breaks
+        String[] parts = text.split("(?<=[.!?])\\s+");
         List<String> result = new ArrayList<>();
-        for (String p : parts) {
-            String s = p.trim();
-            if (s.length() > 2) result.add(s);
+        
+        if (parts.length == 1 && !parts[0].isEmpty()) {
+            // Backup for standard splitting if regex fails to find clusters
+            result.add(parts[0].trim());
+        } else {
+            for (String p : parts) {
+                String s = p.trim();
+                if (s.length() > 2) result.add(s);
+            }
         }
         return result;
     }
+
 
     private double calculateCosineSimilarity(Embedding e1, Embedding e2) {
         if (e1 == null || e2 == null) return 0;

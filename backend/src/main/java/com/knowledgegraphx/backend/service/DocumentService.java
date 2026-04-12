@@ -26,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.UUID;
 
 @Service
@@ -105,55 +107,62 @@ public class DocumentService {
                 .build();
 
         Document savedDoc = documentRepository.save(document);
-        if (savedDoc == null) throw new IllegalStateException("Neural Ingestion: Database failed to persist document.");
+        if (savedDoc.getId() == null) throw new IllegalStateException("Neural Ingestion: Database failed to persist document.");
 
         // 10. Neural Indexing & Global Intelligence Mapping
+        final Long sid = sessionId;
+        final Long did = savedDoc.getId();
+        final String dfn = savedDoc.getFileName();
+        final String dfp = savedDoc.getFilePath();
+
         java.util.concurrent.CompletableFuture.runAsync(() -> {
             try {
-                String extractedText = extractText(savedDoc);
-                log.info("Neural Sync: Extracted {} characters of intelligence from {}", extractedText.length(),
-                        savedDoc.getFileName());
-                // Phase A: Semantic Indexing (Vector) - Handled sequentially to prevent Ollama
-                // Model Memory Thrashing
-                try {
-                    vectorSearchService.ingestDocument(extractedText, sessionId, savedDoc.getId(),
-                            savedDoc.getFileName());
-                    log.info("Neural Sync: Vectorization successful for doc {}", savedDoc.getFileName());
-                } catch (Exception e) {
-                    log.error("Neural Sync: Vectorization failed for doc {}: {}. RAG results may be degraded.",
-                            savedDoc.getFileName(), e.getMessage());
+                // Short wait to ensure Database Transaction is committed
+                Thread.sleep(500); 
+                
+                Document docProxy = documentRepository.findById(did).orElse(null);
+                if (docProxy == null) {
+                    log.error("Neural Sync: Could not find document {} in DB for ingestion. Ingestion aborted.", did);
+                    return;
                 }
 
-                // Phase B: Intelligence Mapping (Entities & Graph) - Runs only AFTER vectors
-                // are complete
+                String extractedText = extractText(docProxy);
+                if (extractedText == null || extractedText.isBlank()) {
+                    log.warn("Neural Sync: No intelligence extracted from {}. Segments will be empty.", dfn);
+                    return;
+                }
+                
+                log.info("Neural Sync: Extracted {} characters of intelligence from {}", extractedText.length(), dfn);
+                
+                // Phase A: Semantic Indexing (Vector)
+                try {
+                    vectorSearchService.ingestDocument(extractedText, sid, did, dfn);
+                    log.info("Neural Sync: Vectorization successful for doc {}", dfn);
+                } catch (Exception e) {
+                    log.error("Neural Sync: Vectorization failed for doc {}: {}", dfn, e.getMessage());
+                }
+
+                // Phase B: Intelligence Mapping (Entities & Graph)
                 synchronized (this) {
                     try {
-                        entityExtractionService.extractAndSaveEntities(savedDoc, extractedText);
-                        log.info("Neural Sync: Entity mapping successful for doc {}", savedDoc.getFileName());
-                        // Notify all session clients that the graph has been updated
-                        try {
-                            java.util.Map<String, Object> graphUpdate = new java.util.HashMap<>();
-                            graphUpdate.put("type", "GRAPH_UPDATED");
-                            graphUpdate.put("sessionId", sessionId);
-                            graphUpdate.put("fileName", savedDoc.getFileName());
-                            messagingTemplate.convertAndSend("/topic/session/" + sessionId, graphUpdate);
-                        } catch (Exception msgErr) {
-                            log.warn("Neural Sync: Could not broadcast graph update event: {}", msgErr.getMessage());
-                        }
+                        entityExtractionService.extractAndSaveEntities(docProxy, extractedText);
+                        log.info("Neural Sync: Entity mapping successful for doc {}", dfn);
+                        
+                        // Notify session clients
+                        Map<String, Object> graphUpdate = new HashMap<>();
+                        graphUpdate.put("type", "GRAPH_UPDATED");
+                        graphUpdate.put("sessionId", sid);
+                        graphUpdate.put("fileName", dfn);
+                        messagingTemplate.convertAndSend("/topic/session/" + sid, graphUpdate);
                     } catch (Exception e) {
-                        log.error(
-                                "Neural Sync: Intelligence mapping failed for doc {}: {}. Knowledge Graph and branching nodes will be empty.",
-                                savedDoc.getFileName(), e.getMessage());
+                        log.error("Neural Sync: Intelligence mapping failed for doc {}: {}", dfn, e.getMessage());
                     }
-                    Thread.sleep(300); // Reduced guard interval - was 2000ms
                 }
 
-                evictSessionAiCache(sessionId);
-                evictSessionAiCache(sessionId);
+                evictSessionAiCache(sid);
 
             } catch (Exception e) {
-                log.error("Neural Sync: Native text extraction failed for doc {}: {}", savedDoc.getFileName(),
-                        e.getMessage());
+                log.error("Neural Sync: Ingestion loop failed for doc {}: {}", dfn, e.getMessage());
             }
         });
 
