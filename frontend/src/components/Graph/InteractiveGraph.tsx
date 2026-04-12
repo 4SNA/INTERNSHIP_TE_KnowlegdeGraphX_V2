@@ -64,9 +64,8 @@ export function InteractiveGraph() {
       const docNodes = data.nodes.filter((n: any) => n.type === 'document').sort((a: any, b: any) => a.label.localeCompare(b.label));
       
       const docCount = Math.max(1, docNodes.length);
-      const r = 280 + (docCount * 25); 
+      const r = 380 + (docCount * 45); // Expanded primary radius
       
-      // Calculate initial center based on container size (approx 1000x800)
       const centerX = 500;
       const centerY = 400;
 
@@ -85,15 +84,18 @@ export function InteractiveGraph() {
          if (parent) {
             const indexInGroup = data.edges.filter((e: any) => e.source === parent.id).findIndex((e: any) => e.target === node.id);
             const totalInGroup = data.edges.filter((e: any) => e.source === parent.id).length;
-            const parentAngle = Math.atan2(parent.y - centerY, parent.x - centerX);
             
-            const angleSpread = Math.PI / 1.5;
-            const angle = parentAngle - (angleSpread / 2) + ((indexInGroup + 0.5) / Math.max(1, totalInGroup)) * angleSpread;
-            const dist = 160 + (indexInGroup % 3) * 45; 
+            // Orbiting distribution: Full 360 degrees if many nodes, otherwise focused arc
+            const angleBasis = Math.atan2(parent.y - centerY, parent.x - centerX);
+            const angleSpread = totalInGroup > 8 ? (Math.PI * 2) : (Math.PI / 1.2);
+            const angle = angleBasis + ((indexInGroup - (totalInGroup / 2)) * (angleSpread / Math.max(1, totalInGroup)));
+            
+            // Staggered distance to prevent collision
+            const dist = 220 + (indexInGroup % 4) * 75; 
             
             return { ...node, x: parent.x + dist * Math.cos(angle), y: parent.y + dist * Math.sin(angle) };
          }
-         return { ...node, x: centerX + 400 * Math.cos(Math.random() * 2 * Math.PI), y: centerY + 400 * Math.sin(Math.random() * 2 * Math.PI) };
+         return { ...node, x: centerX + (Math.random() - 0.5) * 1000, y: centerY + (Math.random() - 0.5) * 800 };
       });
       
       setNetwork({ ...data, nodes: processedNodes });
@@ -334,10 +336,10 @@ export function InteractiveGraph() {
               onClick={() => setSelectedNode(node)}
             >
               <div className={cn(
-                "w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all shadow-xl relative group/node",
+                "w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all shadow-xl relative group/node",
                 getTypeColor(node.type),
-                activeNodeId === node.id && "ring-4 ring-indigo-500/30 border-indigo-400 bg-zinc-950 scale-110",
-                node.type === 'document' ? "bg-zinc-900" : "rounded-full"
+                activeNodeId === node.id && "ring-4 ring-indigo-500/30 border-indigo-400 bg-zinc-950 scale-125",
+                node.type === 'document' ? "bg-zinc-900 w-14 h-14" : "rounded-full"
               )}>
                  {getTypeIcon(node.type)}
               </div>
