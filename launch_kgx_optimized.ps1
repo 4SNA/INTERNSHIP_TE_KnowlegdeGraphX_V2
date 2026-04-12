@@ -53,7 +53,7 @@ Write-Host "Initializing Neural Ignition..." -ForegroundColor Yellow
 if (-not (Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue)) {
     Write-Host " -> Launching Backend Hub..." -ForegroundColor Gray
     $backendDir = "$projectRoot\backend"
-    Start-Process powershell -ArgumentList "-NoExit", "-Command", "title KGX-BACKEND; color 0a; cd '$backendDir'; mvn spring-boot:run -Dspring-boot.run.arguments='--spring.jpa.show-sql=false'"
+    Start-Process powershell -ArgumentList "-NoExit", "-Command", "title KGX-BACKEND; color 0a; cd '$backendDir'; mvn spring-boot:run `"-Dspring-boot.run.arguments=--spring.jpa.show-sql=false`""
 }
 
 # Start Frontend if not already running

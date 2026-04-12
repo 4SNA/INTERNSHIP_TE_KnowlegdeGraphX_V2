@@ -69,7 +69,7 @@ Write-Host "   ✅ Ollama using D:\ollama\models." -ForegroundColor Green
 # 7. MULTI-HUB BOOT (Pure D Execution)
 Write-Host "[6/7] Launching Backend (Pure D Isolation)..." -ForegroundColor White
 # Using absolute paths for EVERYTHING
-$backendCmd = "mvn spring-boot:run '-Dmaven.repo.local=$repoDir' '-Djava.io.tmpdir=$tmpDir' '-Duser.home=$envDir' '-Dspring-boot.run.profiles=local'"
+$backendCmd = "mvn spring-boot:run `"-Dmaven.repo.local=$repoDir`" `"-Djava.io.tmpdir=$tmpDir`" `"-Duser.home=$envDir`" `"-Dspring-boot.run.profiles=local`""
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "title KGX-BACKEND; color 0a; cd $projectRoot\backend; $backendCmd"
 
 Write-Host "[7/7] Launching Frontend (Pure D Isolation)..." -ForegroundColor White

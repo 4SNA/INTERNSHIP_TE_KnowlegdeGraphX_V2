@@ -106,7 +106,7 @@ Write-Host "   ✅ Ollama Pulse Active." -ForegroundColor Green
 
 # 7. BACKEND & FRONTEND IGNITION
 Write-Host "[6/7] Scaling Intelligence Hub (Backend)..." -ForegroundColor White
-$backendCmd = "mvn spring-boot:run '-Dspring-boot.run.profiles=local'"
+$backendCmd = "mvn spring-boot:run `"-Dspring-boot.run.profiles=local`""
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "title KGX-BACKEND; color 0a; cd $projectRoot\backend; $backendCmd"
 
 Write-Host "[7/7] Rendering Neural Dashboard (Frontend)..." -ForegroundColor White
